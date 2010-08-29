@@ -1,0 +1,42 @@
+
+[saw via buzz integration]
+Author=Stef
+Code=  apulse1\tbuzz\t1, ifreq, sr/2/ifreq, 1 ; f1 must be a sine !\n  asaw\tinteg\tapulse1\n  ar\t=\tasaw-.5\n
+Category=Waveforms
+Comments=a saw from Hans Mikelson
+
+[flat segment (8192 points)  ]
+Author=Stef
+Code=f10 0 8192 5 1 8192 1
+Category=Function Tables
+Comments=To be sculpted with an envelope editor...
+
+[note + amplitude]
+Author=Stef
+Code=ifreq\tcpsmidi\niamp\tampmidi\t1\ninum\tnotnum\nivel\tveloc
+Category=MIDI
+Comments=i-variables associated to the Note On that trigerred the instrument
+
+[MIDI file rendering]
+Author=Stef
+Code= -dWo result.wav -TF /some/midi/file.mid
+Category=CsOptions
+Comments=flags for the rendering of a MIDI file
+
+[declicking]
+Author=Stef
+Code=idct            =               .0001\nadclick         expseg          .001, idct, 1, idur-(idct*2), 1, idct, .001
+Category=Envelopes
+Comments=exponential declicking envelope
+
+[menu template]
+Author=Stef
+Code=;|menu NAME\n;|choice1\n;\n;\n;|choice2\n;\n;\n;|choice3\n;\n;\n;|endmenu\n
+Category=Meta-comments
+Comments=template for a meta-menu
+
+[toggles template]
+Author=Stef
+Code=;|toggles NAME\n;|part1\n;\n;\n;|part2\n;\n;\n;|part3\n;\n;\n;|endtoggles\n
+Category=Meta-comments
+Comments=template for meta-toggles

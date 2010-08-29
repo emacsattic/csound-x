@@ -1,0 +1,3596 @@
+     
+@setfilename csound-x.info
+@settitle Csound-x 
+
+@direntry
+* Csound-x: (csound-x).       Extensions to csound modes.
+@end direntry
+
+
+
+@ifinfo
+This file documents Csound-x.
+
+This is edition 2.10 of the Csound-x manual
+
+@example
+Copyright (C) 2000-2008 Stéphane Rollandin
+@end example
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end ifinfo
+@c
+
+@c
+@setchapternewpage odd
+
+@titlepage
+@title Csound-x Manual
+@subtitle For Csound-x version: 2.10
+
+@author by Stéphane Rollandin
+@end titlepage
+
+@contents
+
+@node Top, About this documentation, (dir), (dir)
+@unnumbered Csound-x documentation
+
+last updated @today{}
+
+@menu
+* About this documentation::    A work in progress...
+* Overview::                    What Csound-x exactly is
+
+* Distribution::                Getting Csound-x and its friends
+* Installation::                How to install Csound-x
+
+* Basic usage::                 Dealing with the various modes
+* Score editing::               The csound-score major mode
+* Orchestra editing::           The csound-orc major mode
+* CSD editing::                 The csound-csd major mode
+
+* Libraries and repositories::  Finding efficiently what we need
+* Csound invocation::           Csound as an Emacs sub-process 
+* Integrated documentation::    On-line help
+* Score matrices::              Matrices in a score
+
+* Handling MIDI data::          Handling MIDI data within a CSD 
+
+* Embedded elisp::              Stuffing a CSD document with Emacs Lisp code
+* CSD meta-controls::           Tweaking a CSD via Emacs menus
+* The i library::               Generating a stream of i-statements
+* The k library::               MIDI streams with Keykit syntax
+* Csound Elisp::                Composing directly in Emacs Lisp
+
+* Concept index::               General concepts
+* Command index::               Commands responding to M-x
+* Variable index::              Customization variables and hooks
+* Function index::              Public internal Emacs Lisp functions
+
+* Known bugs::                  Bugs and incompatibilities 
+@end menu
+
+
+@c ==================================================================
+@node About this documentation, Overview, Top, Top
+@unnumbered About this documentation
+
+... well it is a work in progress. Feedback is welcome !
+
+Stef
+
+hepta@@zogotounga.net
+
+
+@c ==================================================================
+@node Overview, Distribution, About this documentation, Top
+@unnumbered Overview
+@cindex features
+
+Csound-x is a set of editing modes and libraries intended to compose
+music for Csound without leaving Emacs. Its main purpose is to propose
+a full-featured textual front end for Csound. 
+
+It is developed using GNU Emacs 23.
+
+GNU Emacs 21 and 22 should be supported but this is not tested. 
+XEmacs is not supported.
+
+@sp 1
+
+@unnumberedsubsec Editing & compiling Csound documents
+
+Csound-x provides indentation and fontification for scores and
+orchestras. Direct access to the Csound documentation allows insertion
+of opcode templates. 
+
+A CSD can be generated from a simple text containing a score and
+an orchestra, as pasted from a mail or a manual for example. The CSD
+can also be generated directly from the clipboard contents.
+
+The package makes it easy to toggle from an orc/sco pair to a CSD. 
+Compilation of both formats can be driven from Emacs.
+
+Documents can be processed on-the-fly with multiple configurations of
+Csound which can be customized and made available from a menu. It is
+thus very easy to swap from DAC rendering to WAV file compilation, or
+from different versions of Csound.
+
+@sp 1
+
+@unnumberedsubsec Extending Csound documents
+
+Csound-x makes it possible to have richer Csound documents by
+adding either comments or mark-ups making sense for Emacs. 
+
+The documents are still valid for direct compilation by Csound; simply
+they also embed high-level information making them easier to work on. 
+For example, a CSD can become tunable from an Emacs menu, or become an
+algorithmic template for a whole family of CSD documents.
+
+A library for score generation is included (@pxref{The i library}.)
+so that the score section of a CSD can be algorithmically generated or
+modified.
+
+MIDI data can be included in various form, most notably using Keykit
+format (@pxref{Handling MIDI data}.), (@pxref{The k library}.)
+
+Support for algorithmic generation of instruments is being implemented
+(@pxref{Csound Elisp}.)
+
+@sp 1
+
+@unnumberedsubsec Generating Csound documents
+
+Csound-x can also work upside-down: instead of editing Csound
+documents within Emacs it is possible to directly compose in Emacs
+Lisp with the underlying temporary CSD document remaining implicit.
+(@pxref{Csound Elisp}.)
+
+@sp 1
+
+@unnumberedsubsec Providing Csound access to a larger system
+
+Csound-x is a main component of Surmulot, an open system for musical
+composition (@pxref{(Surmulot)Top}.)
+
+Surmulot home page: 
+@uref{http://www.zogotounga.net/surmulot/surmulot.html}
+
+@sp 1
+
+@menu
+* Features::           a detailed list of features
+* CSD markups::        extensions to the CSD format
+@end menu
+
+@c ==================================================================
+@node Features, CSD markups, Overview, Overview
+@section Features provided by Csound-x
+
+
+@itemize @minus
+@item
+integrated access to the documentation (insertion of opcode templates,
+easy fetching of opcode examples).
+
+@item
+merging of sco and orc buffers or files into a CSD buffer,
+splitting of a CSD document in sco and orc buffers.
+direct generation of a CSD from the clipboard contents
+
+@item
+partial editing of a document through indirect buffers 
+(isolating score, orchestra, or a single intrument)
+
+@item
+direct invocation of Csound to process the current document, or part
+of it (it is possible to render only a region from a score)
+
+@item
+speedbar support for CSD documents
+
+@item
+extensible code repository (using the same file format as CsEdit).
+  
+@item
+fully integrated visual f-table edition (with Emacs 22 only) 
+
+@item
+searching for a string or regexp across a collection of orc and CSD
+files
+
+@item
+fetching the source code for a macro or an #included file
+
+@item
+defining matrices in a score and operating of them, using the full
+power of the Calc package (@pxref{(Calc)Top})
+
+@item
+seamless interfacing with Cmask
+
+@item
+easy and powerful interfacing with the SES spreadsheet package. any
+matrix can be edited as a spreadsheet, spreadsheets (with their
+formulas) can be embedded in a CSD document to be re-used later on
+
+@item
+improvements to font-lock (macros, etc.), with easy customization
+
+@item
+generating MIDI files on-the-fly from Keykit code embedded in a CSD,
+so that a single CSD document can contain (and play) any number of
+MIDI phrases, either hard-coded or algorithmically generated
+
+@item
+embedding of Emacs Lisp code within a CSD document
+
+@item
+low-level library for algorithmic composition
+
+@item
+CSD snapshots, meta-menus & other exotic features allowing a CSD document to
+be tuned at a very high level from Emacs menus or commands
+
+@item
+macros for writing Csound instruments in Emacs Lisp
+
+@end itemize
+
+@c ==================================================================
+@node CSD markups, , Features, Overview
+@section Csound-x extensions to the CSD format
+@cindex extensions to the CSD format
+
+Csound-x defines the following markups to be used outside the <CsSynthesizer>...</CsSynthesizer> section of a CSD
+document:
+
+@table @code
+@item <ELISP>...</ELISP>
+@xref{Embedded elisp}.
+@item <SES>...</SES>
+@xref{Matrices & spreadsheets}.
+@item <KeyPhrase>...</KeyPhrase>
+@xref{Handling MIDI data}.
+@item <MPhrase>...</MPhrase>
+@xref{Handling MIDI data}.
+@end table
+
+Csound-x  also gives a specific meaning to comments in orchestras and scores
+that start with ;| 
+
+
+@c ==================================================================
+@node Distribution, Installation, Overview, Top
+@unnumbered How to get Csound-x and its external components
+
+Csound-x is released under the General Public Licence, version 2.
+
+The latest version is available as a stef-elisp.zip archive from 
+@uref{http://www.zogotounga.net/comp/csoundx.html}
+
+Surmulot provides Csound-x and much more, with no installation hassle:
+@uref{http://www.zogotounga.net/surmulot/surmulot.html}
+
+@sp 1
+@c @xref{Installation}.
+
+@anchor{required utilities}The following programs are either required
+by Csound-x, or at least considered very useful:
+
+@itemize @minus
+
+@item
+@strong{REQUIRED}: 
+
+The Calc package for Emacs. It is part of the newest Emacs versions.
+
+If you do not have it installed in Emacs 21, the simplest way is to get it here:
+@uref{http://www.zogotounga.net/comp/calc-2.02f.zip}
+
+Then add the following to .emacs:
+
+@example
+(setq load-path (nconc load-path (list "~/site-lisp/calc-2.02f")))
+;; (... change the path according to your installation)
+@end example
+
+
+@item
+@strong{highly recommended}:
+
+The MMM mode for Emacs. This allows several major modes to coexists in
+the same buffer. Get it here: @uref{http://mmm-mode.sourceforge.net/}
+
+
+@item
+@strong{recommended}:
+
+Cmask, a multiplatform stochastic event generator for
+Csound. Homepage: @uref{http://www.kgw.tu-berlin.de/~abart/CMaskMan/CMask-Download.htm}
+
+
+@item
+@strong{recommended}:
+
+The SES package for Emacs. This is a spreadsheet, very convenient for
+manipulating matrices defined in a score. It is part of Emacs 22. 
+
+Homepage: @uref{http://mywebpages.comcast.net/jyavner/ses/}
+
+
+@item
+@strong{recommended}:
+
+Keykit, a multiplatform interpreted language/environment for
+programming everything MIDI. Its command-line executable (lowkey, from
+the usual Keykit distribution) is required by csound-key (@pxref{Handling MIDI data})
+
+Homepage: @uref{http://nosuch.com/keykit}
+
+
+@item
+@strong{highly recommended}:
+
+Csound :)
+
+@end itemize
+
+
+@c ==================================================================
+@node Installation, Basic usage, Distribution, Top
+@chapter How to install Csound-x
+@cindex installation
+
+@sp 1
+
+@unnumberedsubsec The fast way
+
+Download Surmulot to have a fully working Csound-x with many extra
+features (notably graphical interfaces) by simply unzipping an archive:
+@uref{http://www.zogotounga.net/surmulot/surmulot.html}
+
+The following only applies if you want to install Csound-x by yourself.
+
+@sp 1
+
+@unnumberedsubsec Preparation
+
+First of all, install the required packages @xref{required utilities}.
+
+On Emacs 22 you can skip this step, although you will miss MMM.
+
+@sp 1
+@unnumberedsubsec Installation
+
+Unpack the stef-elisp.zip archive in your site-lisp directory, then add the following line
+to your .emacs file:
+
+@example
+(require 'stef-elisp)
+@end example
+
+Evaluate it to have the package immediately available.
+
+@sp 1
+@unnumberedsubsec Compilation
+
+You may byte-compile every file in the distribution for faster execution.
+
+@sp 1
+@unnumberedsubsec Configuration & customization
+
+A few variables need to be set in order to fit your system via
+@example
+M-x customize-group csound-x
+@end example
+
+Most variables can keep their default setting. If you don't
+understand what they do, just leave them as is.
+
+On windows system, your Csound installation should be detected
+automatically at start-up. You can test this for example by evaluating
+the code in @xref{Csound Elisp}.
+
+
+@c ==================================================================
+@c ==================================================================
+@node Basic usage, Score editing, Installation, Top
+@chapter Basic usage
+
+@sp 1
+@unnumberedsubsec Editing orc&sco 
+
+Csound-x provides the major modes csound-sco-mode and csound-orc-mode
+for editing respectively score and orchestras. These are modified
+versions of the modes written by John Fitch. 
+
+@xref{Score editing}.
+@xref{Orchestra editing}.
+
+@sp 1
+@unnumberedsubsec Editing a CSD
+
+Csound-x also provides a major mode for CSD buffers. 
+It is recommended to use the CSD format when starting a project from
+scratch. @xref{CSD editing}.
+
+@sp 1
+@unnumberedsubsec Editing orc&sco within a CSD
+
+When the MMM mode is installed (@xref{Distribution}.), it is possible to
+have the score and orchestra major modes enabled together in a single
+CSD buffer.
+
+Alternatively, the score and orchestra sections of a CSD can be edited
+independently via indirects buffers. This should happen by default when
+the MMM mode is not available (in Emacs an indirect buffer is just
+another interface to the original buffer; so editing the score or
+orchestra there actually edit the CSD. @xref{(emacs) Indirect Buffers}.)
+
+@sp 1
+@unnumberedsubsec From orc & sco to CSD
+@cindex wrapping orc & sco into a CSD
+
+Both csound-sco-mode and csound-orc-mode menus provide a "Wrap in
+.CSD" item. 
+The simplest way to use it is to divide the Emacs frame in two
+windows, with a score buffer in one and an orc buffer in the
+other. Invoking "Wrap in .CSD" from any of the buffers will create a
+new CSD buffer with the same name as the buffer you called it from,
+embedding the codes for orchestra and scores. If no associated buffer
+exist, a buffer with the same root name will be detected; if no such
+buffer exists, you will be asked if you want to go and fetch a file,
+or if the corresponding CSD section should be left empty. 
+
+The CSD buffer name is built from the original sco or orc buffer. Note
+that if a buffer with that name already exists and you accept to overwrite it,
+only the <Score> and <Orchestra> sections will actually be
+overwritten. This makes it possible to split a CSD buffer into an orc/sco
+pair, work on them, then assemble them back in the CSD, without loosing
+any extra information (such as the <Options> section) in the initial CSD.
+
+When a CSD is first created, by default the "<Options>" section is left
+void. Customize the variable cscsd-default-options to define the content
+you want there.
+
+"Wrap in .CSD" either updates an existing CSD buffer or creates one. The
+initial sco and/or orc buffers are never modified nor killed. The associated
+command is:
+
+@deffn Command cscsd-wrap-buffer
+Associate the current buffer to a sco or orc file and create a csd;
+if `next-window' displays a complementary buffer, it is proposed as default
+otherwise we look for a complementary buffer with the same root name
+or else we look for a complementary file in the same directory
+... and if all of this fails we just ask.
+
+do nothing if we already are in a csd buffer                  
+@end deffn
+@pindex cscsd-wrap-buffer
+
+@sp 1
+@unnumberedsubsec From CSD to orc & sco
+@cindex splitting a CSD into into orc & sco
+
+In the ``CSD'' menu, item "orc/sco -> Split in orc/sco" creates a score
+and an orchestra buffers from the current CSD buffer. The name of the
+initial buffer is kept; for example "yop.csd" leads to "yop.sco" and
+"yop.orc". The initial CSD is left untouched.
+
+@sp 1
+@unnumberedsubsec CSD from scratch
+@cindex generating a CSD from scratch
+
+Still in the ``CSD'' menu, item "Build a true CSD" tries to analyse
+the buffer content which should contain one score and one orchestra,
+and attempts to wrap this into a true .csd format. The intent of this
+command is for example to easily convert a text from an email into a CSD. 
+It tries to guess where starts orc and where starts sco by looking for
+lines matching the regexps listed in 'cscsd-orc-delimiter-regexps and
+'cscsd-sco-delimiter-regexps. The associated command is:
+
+@deffn Command cscsd-auto-import
+Create a csd from the full contents of current buffer                 
+@end deffn
+@pindex cscsd-auto-import 
+
+@defvar cscsd-orc-delimiter-regexps
+List of regexps to be tried in order to guess where the orchestra
+starts in a plain text file known to contain a score and an orchestra
+with no csd syntax to wrap them.           
+@end defvar
+
+@defvar cscsd-sco-delimiter-regexps
+List of regexps to be tried in order to guess where the score starts
+in a plain text file known to contain a score and an orchestra with no
+csd syntax to wrap them.                
+@end defvar
+
+"Build a CSD from clipboard" is similar, only it creates a CSD
+from the content of the OS clipboard. Associated command is
+
+@deffn Command cscsd-import-from-clipboard    
+Create a csd from the contents of the OS clipboard               
+@end deffn
+@pindex cscsd-import-from-clipboard 
+
+To extract a CSD from a buffer (for example an info page), use
+
+@deffn Command cscsd-at-point
+Create a csd from the contents of current buffer around point                 
+@end deffn
+@pindex cscsd-at-point 
+
+
+@c ==================================================================
+@c ==================================================================
+@node Score editing, Orchestra editing, Basic usage, Top
+@chapter Score editing
+
+The csound-score provides indentation, fontification and a ``SCO''
+menu. 
+
+@sp 1
+
+@cindex edit a f-table
+@unnumberedsubsec edit a f-table
+@c @item "Display/Edit f-table" uses a sound wave editor to display any
+@c f-table in the score. You are queried for an amplitude factor:
+@c entering "auto" will set it to 32000 for normalized tables, and to 1
+@c for all other tables. This feature requires that 'cscsd-csound-binary,
+@c 'cscsd-SSDIR and 'cscsd-wave-editor are set to fit your system.
+
+@c If you answer "y" to the "Edit the table ?" query, then you can use
+@c the editor to change the table shape, and when the editor is closed
+@c (don't forget to save the changes before closing !), the previous
+@c f-statement will be replaced by a GEN1 statement loading the wave file
+@c you just edited (at this point you will also be queried for a new name
+@c to give it so that it will not be overriden by future similar
+@c operations). Note that for the sake of simplicity the new GEN1
+@c f-statement is always normalized.
+
+@c @item "Source of macro at point" 
+@c @xref{Orchestra editing}.
+
+@c @item "Visit included file at point" 
+@c @xref{Orchestra editing}.
+
+@c @cindex processing a sco file
+@c @item "Compile score"
+@c compile the current score, if 'cscsd-associated-orc returns an
+@c orchestra file. you may want to define your own value for
+@c 'cscsd-associated-orc: by default it simply looks in the same
+@c directory for an orc with the same name.
+
+@c the variable 'cscsd-shell-compile-sco defines the compilation
+@c flags
+
+
+
+@c @item "Play/Edit"
+@c play or edit the compiled score, according to 'cscsd-shell-play-audio
+
+@c @end itemize
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node Orchestra editing, CSD editing, Score editing, Top
+@chapter Orchestra editing
+
+... this is not fully documented yet
+
+@sp 1
+@unnumberedsubsec Indentation
+
+Use @samp{<tab>} to indent the line at point. 
+If the line only contains an opcode fragment, then successive
+@samp{<tab>} strokes propose in turn all possible completions, with
+template and documentation. Press @samp{y} to accept a template, or @samp{<esc>} to
+cancel the whole operation. 
+
+
+@c @sp 1
+@c @unnumberedsubsec Some items in the ``Csound/Orc'' menu:
+
+@c @itemize @minus
+@c @cindex displaying the source for a macro
+@c @item "Source of macro at point" 
+@c displays in other-window the code for the macro at point, if it can be found
+
+@c @cindex displaying an #include-d file
+@c @item "Visit included file at point" 
+@c displays in other-window the file referenced by the #include statement at point, if it can be found
+
+@c @item "Edit instrument by itself"
+@c create an indirect buffer displaying one instrument alone.
+@c choose which one at the minibuffer (default is the one at point)
+
+@c @cindex searching a collection of orchestras for a string
+@c @item "Search through all orchestras"
+@c this launches a search for a string in all *.csd and *.orc files in the
+@c directories listed in 'cscsd-orchestras-path
+
+@c @item "Process file"
+@c ... is only active if we are in an indirect buffer: it processes the
+@c source CSD (@pxref{The CSD menu})
+
+@c @end itemize
+
+@c ==================================================================
+@c ==================================================================
+@node CSD editing, Libraries and repositories, Orchestra editing, Top
+@chapter CSD editing
+
+
+csound-csd-mode is a major mode for CSD files, which gets started whenever
+you visit a file with extension .csd. 
+
+@sp 1
+
+@menu
+* The CSD menu::                the csound-csd-mode menu
+* CSD related functions::       reference for useful public functions
+@end menu
+
+
+@c ==================================================================
+@node The CSD menu, CSD related functions, CSD editing, CSD editing
+@section The CSD menu
+
+The ``CSD'' menu is shared among all types of csound buffers. 
+
+With fewer items in simple orchestra and score buffers, it allows
+conversion to CSD and access to high-level editing features.
+
+In CSD buffers the ``CSD'' menu appears in full; it can be divided
+in the following sections:
+
+@sp 1
+@unnumberedsubsec High-level tuning
+
+This part of the menu is dynamically computed to reflect the
+meta-controls defined in the CSD. @xref{CSD meta-controls}.
+
+These include snapshots and Embedded Emacs Lisp (EEL) settings. 
+EEL provides a clean way to integrate Emacs Lisp code within a CSD
+document, so that it can become tunable at a very high level, become
+the template for a whole family of algorithmic compositions, or even
+become a program in itself. It is a very powerful feature that can
+bring you very far away from usual csound programming... 
+@xref{Embedded elisp}. 
+
+
+@sp 1
+@unnumberedsubsec Structure navigation and editing
+
+The "Structure" submenu allows both exploration of the CSD structure
+and individual edition of its different components.
+
+Exploration can be driven via the speedbar which allows you to
+directly jump to critical places in the document: score, orchestra,
+intruments, f-tables, score matrices, SES areas, EEL meta-comments.
+
+Score and orchestra can be separated either virtually, via indirect
+buffer, or really, by creating new independent score and orchestra
+buffers.
+
+The submenu also provides ways to rebuild the CSD, or create one from
+the clipboard contents.
+
+
+@sp 1
+@unnumberedsubsec Documentation and orchestras library
+
+This section gives access to Csound HTML documentation. 
+@xref{Integrated documentation}.
+
+It also provides entry points to the orchestras library.
+@xref{Libraries and repositories}.
+
+@sp 1
+@unnumberedsubsec High-level editing
+
+... this is not fully documented yet
+
+@itemize @minus
+@item ``macroify region'' region replaces the current region by a
+macro invocation (for which you must provide a name); it defines
+the corresponding macro at the beginning of the <CsInstruments> or
+<CsScore> section.
+ 
+@end itemize
+
+@c @item "Insert KeyPhrase area" is enabled only if keykit-mode is
+@c provided.
+@c It creates a section structured like follows:
+
+@c @example
+@c <KeyPhrase label="name"> 
+@c ...
+@c KeyPhrase= ... 
+@c </KeyPhrase>
+@c @end example
+
+@c this is used to embed Keykit code. This code should define a MIDI phrase and store
+@c it in variable KeyPhrase. @xref{Handling MIDI data}.
+
+
+@sp 1
+@unnumberedsubsec Processing
+
+The last items invoke external softwares (most notably Csound) for
+processing the .csd file. @xref{Interactive invocation from CSD}.
+
+
+
+
+@c ==================================================================
+@node CSD related functions,  , The CSD menu, CSD editing
+@section Useful public functions for CSD handling
+
+... this is not documented yet
+
+@c You will find in this page some documentation for useful functions
+@c that have not been discussed elsewhere
+
+@c For a full list of documented function, @xref{Function index}.
+
+@c @sp 1
+@c @unnumberedsubsec Managing macros in orc & sco
+
+@c @defun cscsd-macroify beg end &optional name
+
+@c transform region BEG to END into a macro NAME, and move the point at
+@c the beginning of the macro definition.
+
+@c this works both in orchestra or score, the #define lines being appended at
+@c the beginning of the corresponding section 
+@c @end defun
+
+@c @sp 1
+
+@c @defun cscsd-define-macro name section value
+@c   #define macro NAME with value VALUE, a string or a number, in
+@c   SECTION, either 'orc or 'sco
+@c @end defun
+
+@c @sp 1
+
+@c @defun cscsd-set-macro-def name value &optional section
+
+@c set the VALUE, a string or a number, for the macro NAME.
+
+@c in case NAME is defined in both score and orchestra, use a third
+@c argument SECTION to specify which one is to be affected: SECTION can be
+@c either 'sco or 'orc
+
+@c the function returns nil if macro NAME is not found, t if it is found;
+@c you may use a nil VALUE, in which case the function simply query for
+@c the existence of the macro.
+
+@c @end defun
+
+@c @sp 1
+@c @unnumberedsubsec Processing a document
+
+@c @defun cscsd-compile-score &optional orc-file audio-file
+@c compile the score in the current buffer, with ORC-FILE or with the
+@c orchestra file returned by 'cscsd-associated-orc
+
+@c if AUDIO-FILE is not provided, the audio file name is built from the
+@c current buffer file name
+@c @end defun
+
+@c @sp 1
+@c @defun cscsd-process-region &optional beg end
+@c process the region as a full csd, with cscsd-process
+@c @end defun
+
+@c @sp 1
+@c @defun cscsd-play &optional audio-file
+@c play AUDIO-FILE or cscsd-latest-audio-file, using the command
+@c 'cscsd-shell-play-audio
+@c @end defun
+
+@c @sp 1
+
+@c @defun cscsd-audio-available-p
+@c tests weither cscsd-latest-audio-file is a valid audio file name in
+@c SFDIR, or else if there is in SFDIR an audio file with the same root
+@c name as the current buffer file name this decides weither the
+@c 'Play/Edit' items are available from the ``CSD'' and ``Orc'' menus
+@c @end defun
+
+
+
+@c @sp 1
+@c @unnumberedsubsec Misc.
+
+@c @defun cscsd-set-Options &rest bits
+
+@c create or update the <Options> section, filling it with the
+@c concatenation of its arguments (strings)
+
+@c @end defun
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node Libraries and repositories, Csound invocation, CSD editing, Top
+@chapter Libraries and repositories
+
+@sp 1
+@unnumberedsubsec The orchestras library
+
+The ``orc/csd'' sub-menu gives access to a user-defined library of
+orchestra code. You may search for a string or a regular expression
+within the whole library.
+
+To define the directories constituting the library, use items ``Set
+path'' and ``Set recursive path'' (all directories in the recursive
+path add their subdirectories tree to the library). Within these
+directories, all *.orc, *.csd and *.udo files are part of the library.
+
+The result of a query appears as a list of files in a buffer from where you can either
+jump to a given source (by clicking the file name) or directly process
+the file (using the left button, which may not exists if no
+score was found).
+
+
+@sp 1
+@unnumberedsubsec The code repository
+
+@cindex code repository
+@cindex CsEdit
+@cindex csr files
+``Code repository'' is a sub-menu common to all csound modes menus. It
+provides insertion of code chunks stored in *.csr files, a simple
+format used by CsEdit (Csound code editor for Windows) for its "code
+repository" feature. So these files can be shared between CsEdit and Emacs.
+
+CsEdit home page is @uref{http://flavio.tordini.org/csound-editor}
+
+You need to customize the variables 'cscsd-csr-files (this one should
+be a list of the *.csr file to import within Emacs) and
+'cscsd-current-csr-file (this one defines which file is getting edited
+when registering a new bit of code).
+
+Once this is done, the region can be added to the repository with the
+menu item "Register region", while you can directly edit (and thus
+correct or improve) the corresponding .csr file with the item "Edit
+csr file"
+
+By default, you should have some example code stored in the file
+somecode.csr (provided that csound-x is a folder in your ~/site-lisp,
+which is the recommended installation. @pxref{Installation})
+
+Note: you may also want to customize 'cscsd-csr-author in order to
+provide a value for the "Author" fields in the *.csr
+
+
+@c ==================================================================
+@c ==================================================================
+@node Csound invocation, Integrated documentation, Libraries and repositories, Top
+@chapter Csound invocation
+
+Csound can be operated as an Emacs sub-process provided that the
+following customizable variables are correctly set:
+
+@defvar cscsd-csound-binary
+The default csound binary               
+@end defvar
+
+@defvar cscsd-process-file
+A list of pairs (NAME FUNCTION) or (NAME SYSTEM-CALL) among which you
+can choose which process is to be invoked by the "process file" and
+"process regions" items from the "Csd" menu.
+@end defvar
+
+@menu
+* Interactive invocation from CSD::
+* Interactive invocation from orc&sco::
+* Invocation functions::
+@end menu
+
+@c ==================================================================
+@node Interactive invocation from CSD, Interactive invocation from orc&sco, Csound invocation, Csound invocation
+@section Interactive invocation from CSD
+
+@unnumberedsubsec ``CSD'' menu items for processing
+@cindex processing a CSD file
+@itemize @minus
+@item "Select processing" opens a sub-menu based on the value of the
+customizable variable 'cscsd-process-file, which is a list of functions
+or shell commands available to process the currently visited .csd
+buffer.
+
+This sub-menu provides a convenient way to keep different csound
+executables and/or different ways to process the file at hand.
+ 
+When you choose the current processing here, this choice is saved and
+kept across Emacs sessions; internaly, this happens by setting the
+customizable variable 'cscsd-current-processing
+
+Alternatively, you can make the processing buffer-local: only the
+current CSD document will be processed according to this choice. Other
+documents either keep their own local setting or obey the global one.
+
+If you answer 'yes' to the prompt proposing to hard-code the
+processing value, a comment line is inserted at the beginning of
+the CSD buffer. The setting will be saved across Emacs sessions.
+(@inforef{File Variables,, emacs}).
+
+If you happen to be in an indirect buffer, the setting is kept local
+to that buffer, and you will not be asked if you want to hard-code its
+value.
+
+@item "Process file" does whatever the current processing defines. 
+By default it should starts Csound and renders the currently visited
+CSD as a .wav audio file in the SFDIR directory.
+
+@item "Process region" does the same as "Process file", except that it
+first restricts the score to the current region.
+
+For this to work properly, the region must feature a subset of
+i-statements in the score (possibly with comments and empty
+lines). The first lines of the score will be kept, up to and excluding
+the first appearing i-statement, so that the possibly required ftables
+will hopefully still be present. Then the region will be added,
+followed by a "e" statement which ends the score. A time offset will
+be proposed at the minibuffer, so that the trimmed score starts at
+t=0. You may change it as you like.
+
+This uses a temporary CSD file whose location you should set by
+customizing 'cscsd-temp-csd-file. If something gets wrong in the
+rendering process then this is the place to have a look at. 
+
+Processing a region is likely to fail for complex scores with tempo
+statements and multiple sections.
+@end itemize
+
+@sp 1
+@unnumberedsubsec Access to rendered audio file
+
+When the current processing compiles an audio file, its location is
+stored in the buffer-local variable 'cscsd-latest-audio-file. When
+this variable is non-nil, ``Play file'' and ``Edit file'' items are
+activated.
+
+"Play file" does whatever the customizable shell command
+'cscsd-shell-play-audio does. "Edit file" action is similarly defined
+by customizable shell command `cscsd-shell-edit-audio.
+
+@sp 1
+
+@defvar cscsd-latest-audio-file
+Record the name of the latest compiled audio file.
+It is buffer-local: an audio file can thus be associated to each CSD or
+score buffer.     
+@end defvar
+
+@defvar cscsd-shell-play-audio
+Shell command used to play an audio file.
+It should feature a single %s occurrence, to be replaced with the audio file
+name.           
+@end defvar
+
+@defvar cscsd-shell-edit-audio
+Shell command used to edit an audio file.
+It should feature a single %s occurrence, to be replaced with the audio file
+name.           
+@end defvar
+
+@c ==================================================================
+@node Interactive invocation from orc&sco, Invocation functions, Interactive invocation from CSD, Csound invocation
+@section Interactive invocation from orc & sco
+
+... this is not documented yet
+
+
+@c ==================================================================
+@node Invocation functions, , Interactive invocation from orc&sco, Csound invocation
+@section Invocation functions
+
+@unnumberedsubsec Commands
+
+@deffn Command cscsd-process
+Process the file visited by the current csd buffer.
+What this means exactly depends on the function or command 
+associated to `cscsd-current-processing' in `cscsd-process-file'.
+If needed, the audio file name is built from the current buffer file
+name or fetched from the <CsOptions> area.                
+@end deffn
+@pindex cscsd-process
+
+@deffn Command cscsd-process-region
+Process the region as a full csd, with `cscsd-process'              
+@end deffn
+@pindex cscsd-process-region
+
+@sp 1
+@unnumberedsubsec Low-level functions
+
+@defun cscsd-call-csound syscall csd-file &optional audio-file midi-file omacros smacros
+Compile CSD-FILE into AUDIO-FILE, with midi input from MIDI-FILE.
+SYSCALL is interpreted as a shell command by function `cscsd-interpret-command'.
+@end defun
+@pindex cscsd-call-csound
+
+@defun cscsd-interpret-command syscall csd-file &optional audio-file midi-file omacros smacros
+Interpret SYSCALL as a shell command to be used in order 
+to compile CSD-FILE into AUDIO-FILE, using midi input from MIDI-FILE.
+
+SYSCALL must be a string containing up to three occurences of %s, 
+for example: "$csound -dHWo %s %s"
+
+if there is only one %s, it will stand for CSD-FILE.
+
+if there are two of them, the first occurence of %s will be replaced 
+by AUDIO-FILE, and the second %s by CSD-FILE, except if the string "DAC" 
+is detected among the options, in which case the first %s is replaced 
+with CSD-FILE and the second one with MIDI-FILE
+
+if three occurences of %s appear, they stand for AUDIO-FILE, CSD-FILE 
+and MIDI-FILE, respectively.  
+
+OMACROS is a list of cons cells of form '(("MacroName" . MacroValue) ..)
+defining orchestra macros, which are appended to SYSCALL as --omacro: options.
+SMACROS is a similar list defining --smacros: options, for score.
+
+when AUDIO-FILE is nil (and required), it is built from CSD-FILE with 
+an extension depending on the detected flags in the SYSCALL: .wav if a 
+-W is detected, .aif if a -A, no extension otherwise.
+if no option flag is provided the <CsOptions> area is analysed and the 
+filename can be detected there.
+
+when MIDI-FILE is nil (and required), the user is interactively prompted 
+for a file name. 
+ 
+SYSCALL may include the substring "$csound" which is then replaced by 
+the returned value of function `cscsd-csound-binary'.
+
+this function has the side effect of setting buffer-local variables 
+`cscsd-latest-audio-file' and `cscsd-latest-midi-file', respectively to 
+AUDIO-FILE and to the appropriate MIDI file, if any.
+@end defun
+@pindex cscsd-interpret-command 
+
+
+@c ==================================================================
+@c ==================================================================
+@node Integrated documentation, Score matrices, Csound invocation, Top
+@chapter Integrated documentation
+
+@sp 1
+csound-doc provides straightforward access to Csound documentation:
+several brands of HTML manuals, Winhelp file, CsoundAV manual
+
+@sp 1
+@unnumberedsubsec Getting the docs
+
+the "canonical" HTML manual comes with Csound 5
+
+the older "official" HTML manual (David Boothe's) homepage is
+@uref{http://www.lakewoodsound.com/csound/hypertext/manual.htm}
+
+the older "alternative" HTML manual (Kevin Conder's) homepage is
+@uref{http://www.kevindumpscore.com/download.html}
+
+the older Rasmus Ekman's Winhelp file can be possibly be found somewhere on the web...
+
+@sp 1
+@unnumberedsubsec Customization
+
+go to the 'csound-doc customization group and define your settings as 
+follow:
+
+choose one of the HTML manual with 'csdoc-which-manual.
+this will be the manual used to document opcodes and insert opcode templates
+
+set 'csdoc-html-directory and 'csdoc-html-entry-point as needed to
+fit your installation:
+
+'csdoc-html-directory must be the directory where lives the manual you
+just choosed
+
+'csdoc-html-entry-point can be any HTML page: it is only used by the
+``Browse HTML documentation'' menu item. So it is possible to have another
+HTML manual at hand through this variable.
+
+if you want to use the emacs w3 browser instead of the default
+external one, toggle 'csdoc-use-w3' on (note that w3 is an independant
+emacs package; it is not installed in the default configuration).
+in that case if can have the doc window pop up in a specific frame
+by adding the following to your .emacs:
+
+@example
+(add-to-list 'special-display-buffer-names "*Csound Documentation*")
+@end example
+
+@sp 1
+
+set 'csdoc-winhelp-file to the location of csound.help
+
+if this is not correct, Winhelp support will simply be dropped
+altogether.
+
+you may also provide access to CsoundAV HTML docs by setting
+'csdoc-csoundAV-manual-directory
+
+
+@sp 1
+@unnumberedsubsec Usage
+
+when working with csound-orc-mode, a couple of items should now appear
+in the ``ORC'' menu
+
+Here are some of the corresponding interactive commands:
+
+@table @code
+@item M-x csdoc-html-document-opcode           
+document the opcode at point, by opening the corresponding HTML page
+in the associated browser 
+
+@item M-x csdoc-insert-opcode-html-template    
+insert a template for the opcode at point (or provided in the
+minibuffer). 
+
+@item M-x csdoc-browse-html                    
+browse the HTML documentation
+@end table
+
+@c @sp 1
+@c As csound-doc caches the opcodes look-up, you may also find this
+@c command useful when you update the documentation:
+
+@c @table @code
+@c @item M-x csdoc-refresh-html            
+@c refresh the hash table for HTML docs
+@c (no need to do that in a fresh Emacs session !)
+@c @end table
+
+@pindex csdoc-html-document-opcode
+@pindex csdoc-insert-opcode-html-template
+@pindex csdoc-browse-html
+@pindex csdoc-refresh-html
+
+
+@c ==================================================================
+@c ==================================================================
+@node Score matrices, Handling MIDI data, Integrated documentation, Top
+@chapter Score matrices
+
+csound-mx allows the definition of matrices (``selections'') within a
+score, and provides ways to work on them; it also adds an extensible
+Matrix menu to the buffers in csound-sco mode, giving an easy access
+to the most useful functions of this package.
+
+
+@menu
+Basic usage
+
+* Defining selections::
+* Operating on the current selection::
+* Examples::
+* Symbolic operations::
+
+Advanced usage
+
+* Basic functions::
+* Cmask integration::
+@c * cmask examples
+* The repository::
+* Matrices & spreadsheets::
+
+@end menu
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node Defining selections, Operating on the current selection, Score matrices, Score matrices
+@section Defining selections
+
+@cindex matrices
+@cindex selections
+
+A "selection" is a rectangular part of a score identified by two
+comments. Example: 
+
+
+@example
+i 1 24.78 -0.94 2793.230.7 0.4 ;_meuh_b.5
+i 1 16.06 -0.96 3413.510.6 0.3
+i 1 29.98 -0.68 2792.310.6 0.7 ;_meuh_e.6
+i 1 28.27 -0.443636.460.5 0.5
+@end example
+
+Here a selection called "meuh" (the selection id) begins at the 5th
+column in the first line and ends at the 6th column in the third
+line. It represents the matrix 
+
+
+@example
+0.7 0.4
+0.6 0.3
+0.6 0.7
+@end example
+
+You can define as many selections as you want by writing the
+corresponding comments. However, the two Matrix menu items "Select
+rectangular region" and "Select column" make it easy to do it with a
+few mouse clicks.
+
+
+"Select rectangular region" makes a selection from the rectangular
+region between point and mark (if any), "Select column" scans the
+column at point upward and downward and selects a one-column
+matrix. The scan is stopped by any line which is not a i-statement, be
+it a comment or an empty line.
+
+
+Both queries for a selection id (any keyword composed with letters and
+digits). You may just press <RETURN>, in which case the id will be ""
+and the selection will be the current one. The previous current
+selection, if any, will be lost.
+
+
+The current selection is important since it is the one that can be
+directly accessed through the other menu commands. "Store current
+selection" queries for an id and give it to the current selection
+(which is not current any more, then), "Make a selection current"
+queries for an existing id and creates a new current selection from
+the corresponding one (this does not remove it) and "Remove a
+selection" queries for an id and erase the corresponding selection
+(this does not change the current one, except if it is the removed
+one)
+
+
+@cindex highlighting a matrix
+If scomx-highlight-matrices is t, all selections are displayed with a
+background color: by default the color is scomx- selection-color for
+non-current selections, and it is scomx-main-selection-color for the
+current selection.
+
+
+But, if a selection id is recognized as a color name by Emacs, the
+selection will be displayed in that color. So the simplest way to have
+an informative display is to call your selections "green", "orange",
+"gold", "blue", etc.
+
+
+Alternatively, you may also customize scomx-colors-alist which defines
+a list of ids with associated background colors (note that the
+so-called "background colors" can actually be property lists defining
+a face better that the background color only; see the default alist
+for examples).
+
+
+@c ==================================================================
+@c ==================================================================
+@node Operating on the current selection, Examples, Defining selections, Score matrices
+@section Operating on the current selection
+
+
+The "Sort" menu item queries for a column number and sort the current
+selection according to that column.
+
+"Apply script on matrix" let you invoke an external script or
+utility (such as a shell command): just provide its name at the prompt. 
+The script is given from stdin a temporary text file containing the
+current selection. It should output to stdout a selection of the
+same size, in the same format (plain text), which will replace the
+current selection.
+
+
+"Operate on matrix" and "Operate on parameters" allow any mathematical
+operation to be performed on the current selection. They indirectly
+invoke the Calc package to perform the calculations
+(@pxref{(Calc)Top}). This is a wide topic, because Calc is very
+powerful and also not so easy to work with . However, simple
+operations are performed simply... see the advanced usage chapter for
+more in-depth considerations (@pxref{Basic functions}). We will
+proceed here with basic stuff.
+
+
+
+"Operate on matrix" queries for a mathematical operation affecting
+variable m, which is the matrix represented by the current selection.
+
+
+"Operate on parameters" queries for a mathematical operation affecting
+variable p, which takes in turn the value for each field in the matrix
+m. Besides, you can use variables nc and nr to represent the position
+of p in the matrix.
+
+
+The expressions you input will be interpreted as Calc data
+(@pxref{(Calc)Programming}). Two formats are available: algebraic and lisp.
+
+@cindex algebraic expressions
+By default, you are first queried for an algebraic expression. If you
+just press <RETURN>, you will be prompted for a lisp expression. This
+behaviour can be inversed by setting
+scomx-propose-algebraic-input-first to nil (do so via the customization system)
+
+
+@sp 1
+
+An example algebraic expression is 
+
+@example
+10+m
+@end example
+
+This offsets all values in the matrix by 10.
+The corresponding lisp form is: 
+
+@example
+(+ 10 m)
+@end example
+
+The tricky part with the lisp format is that what you input will be
+evaluated within a defmath macro. Please read the "programming"
+chapter of Calc info for what this means exactly
+(@pxref{(Calc)Defining Functions}). The most important point is that floats
+must appear in a specific format. For example, it is an error to write 
+
+
+@example
+(+ 10.05 m)
+@end example
+
+Instead, you must write 
+
+@example
+(+ :"10.05" m)
+@end example
+
+In general, it is thus simpler to use the algebraic format. But lisp
+is much more powerful, so eventually it all depends on what you want
+to do.
+
+
+
+
+@c ==================================================================
+@node Examples, Symbolic operations, Operating on the current selection, Score matrices
+@section Examples
+
+@cindex operating on matrices
+@sp 1
+
+"Operate on matrix" examples (algebraic format):
+
+@table @asis
+@item multiplying m by 2:
+2m
+
+@item replacing all values with their opposite:
+neg(m)
+
+@item keeping only 5 significant digits:
+clean(m,5)
+@end table
+
+@sp 1
+
+"Operate on matrix" examples (lisp format):
+
+@table @asis
+@item direct column matrix filling:
+'(vec (vec 10 20 30))
+ 
+
+@item Cmask invocation (random numbers):
+(cmask m "range 0 5") @xref{Cmask integration}.
+
+@item swapping columns 1 and 2:
+(swap-rows m 1 2) 
+@end table
+
+..note that in the last example it's "rows": this is because internaly
+the matrix is transposed
+
+@sp 1
+
+"Operate on parameters" examples (algebraic format):
+
+@table @asis
+@item replacing values with their sine:
+sin(p)
+
+@item filling with a function of the indexes (1):
+0.1*nr
+
+@item filling with a function of the indexes (2):
+nr+100nc
+
+@item filling with a function of the indexes (3):
+clean(exp(0.1*nr),4)
+
+@end table
+
+
+
+@c ==================================================================
+@node Symbolic operations, Basic functions, Examples, Score matrices
+@section Symbolic operations
+
+@cindex symbolic operations
+@cindex @@
+
+
+Expressions within brackets such as [($CNT./3)+10] are understood and
+symbolically processed. For example, applying p^2 on such a parameter
+would result in [(($CNT./3)+10)^2]
+
+
+The @@ and @@@@ operators are supported. Note that the result of an
+operation is kept in symbolic form only if it can not be
+simplified. As an example, applying p or m (that is, the identical
+operation) on the matrix 
+
+@example
+[1+1]     [1+$x.]
+[3^$CNT.] [3^(2+2)]
+[@@513]    [@@@@513]
+[@@$n.]    0.15
+@end example
+
+...results in: 
+
+@example
+2         [1+$x.]
+[3^$CNT.] 81
+1024      513
+[@@$n.]    0.15
+@end example
+
+... while applying p^2 would result in: 
+
+@example
+4             [(1+$x.)^2]
+[3^(2*$CNT.)] 6561
+1048576       263169
+[@@$n.^2]      0.0225
+@end example
+
+
+@c ==================================================================
+@node Basic functions, Cmask integration, Symbolic operations, Score matrices
+@section Basic functions
+
+
+For complex manipulations, you will need to do some programming. Here
+are documented the most useful functions and macros defined by the
+csound-mx.el package.
+
+Note: all functions having id (a selection name) as an argument must
+be called from within the score buffer.
+
+
+@sp 1
+
+@unnumberedsubsec Wrappers for the Calc world
+
+@findex with-defmath
+@defmac with-defmath &rest body
+Evaluates body within a defmath macro and returns a number
+
+Evaluating within a defmath means that all Calc extensions are
+available, and that Calc format must be used (please refer to the Calc
+manual for details) @xref{(Calc)Top}.
+
+
+@example
+(/ 5 3)
+     => 1
+(with-defmath (/ 5 3))
+     => 1.6666667
+@end example
+@end defmac
+
+@sp 1
+
+@defmac with-alg-defmath &rest body
+Evaluates body within a defmath macro and returns the result as a
+string (in algebraic syntax) 
+
+@example
+(with-alg-defmath (/ 5 3))
+     => "1.6666667"
+@end example
+@end defmac
+
+
+@sp 1
+
+@defmac with-raw-defmath &rest body
+Evaluates body within a defmath macro and returns a Calc data structure in raw form 
+
+@example
+(with-raw-defmath (/ 5 3))
+     => (float (bigpos 667 666 16) -7)
+@end example
+@end defmac
+
+@sp 1
+
+
+@defmac with-defmath-import vlist &rest body
+Similar to 'with-defmath, but allows in VLIST the importation of
+symbols which will refer to the same value inside the defmath as
+outside (sort of "globals").
+
+
+@example
+(let ((A 5)(B 3))
+  (with-defmath-import (A B) (/ A B)))
+     => 1.6666667
+@end example
+@end defmac
+
+@sp 1
+
+@unnumberedsubsec Grabbing and yanking matrices (with Calc)
+
+@defun scomx-grab-matrix id
+Reads the score selection id and returns a matrix in raw Calc format
+
+Note: this function can not be used inside a defmath.
+
+@example
+i 1 24.78 -0.94 2793.230.7 0.4 ;_meuh_b.5
+i 1 16.06 -0.96 3413.510.6 0.3
+i 1 29.98 -0.68 2792.310.6 0.7 ;_meuh_e.6
+
+(scomx-grab-matrix "meuh")
+     => (vec
+         (vec
+          (float 7 -1)
+          (float 6 -1)
+          (float 6 -1))
+         (vec
+          (float 4 -1)
+          (float 3 -1)
+          (float 7 -1)))
+@end example
+
+In the process, all macros are replaced by variables whose names start with macro
+
+@example
+i 1 24.78 -0.94 2793.23[$X.] 0.4 ;_meuh_b.5
+i 1 16.06 -0.96 3413.51[$X.+0.1] 0.3
+i 1 29.98 -0.68 2792.31[$X.+0.2] 0.7 ;_meuh_e.6
+
+(scomx-grab-matrix "meuh")
+     => (vec
+          (vec
+           (var macroX var-macroX)
+            (+
+             (var macroX var-macroX)
+             (float 1 -1))
+            (+
+             (var macroX var-macroX)
+             (float 2 -1)))
+          (vec
+           (float 4 -1)
+           (float 3 -1)
+           (float 7 -1)))
+@end example
+@end defun
+
+@sp 1
+
+
+
+@defun scomx-yank-matrix matrix id
+Write matrix in the score selection id
+
+@example
+(scomx-yank-matrix '(vec (vec 1 2 3) (vec 4 5 6)) "meuh")
+     =>
+
+i 1 24.78 -0.94 2793.231 4 ;_meuh_b.5
+i 1 16.06 -0.96 3413.512 5
+i 1 29.98 -0.68 2792.313 6 ;_meuh_e.6
+@end example
+@end defun
+
+
+@sp 1
+
+@defun scomx-shell-command-with-matrix script id
+Invoke the shell command: script < input-file > output-file
+where input-file is a temporary file containing selection id as plain text,
+and output-file  a temporary file where a replacement for id is read
+@end defun
+
+
+
+@sp 1
+
+
+
+@defmac scomx-operate-m id body
+Evaluates body within a defmath macro, interpreting the variable m as
+the matrix defined by selection id, and replaces that selection with
+the result of the evaluation (which must be a matrix of same
+dimensions) 
+
+@example
+(scomx-operate-m "meuh" (neg m))
+     => replace all values in selection "meuh" with their opposites
+@end example
+@end defmac
+
+@sp 1
+
+
+
+@defmac scomx-operate-p-nc-nr id body
+Evaluates body within a defmath macro for each element of the matrix
+defined by selection id, replacing that element with the result of the
+evaluation. The variable p is interpreted as the element initial
+value, nr as its vertical position (starting with 1 at the top) and nc
+as its horizontal position in the matrix. 
+
+
+@example
+(scomx-operate-p-nc-nr "meuh" (+ p (* 0.1 nr)))
+     => offset all values in selection "meuh"
+        by an amount depending on their vertical index
+@end example
+@end defmac
+
+
+@sp 1
+
+@unnumberedsubsec Grabbing and yanking matrices (directly)
+
+@defun scomx-elt col row &optional sid set-to
+Fetch the element, a string or nil, at column COL and row ROW in matrix SID
+if SID is not provided, it defaults to "", the current selection.
+(note that columns and rows indexes start at 1)
+
+If SET-TO is non nil, it replaces the previous matrix element.
+(SET-TO may be a string or a number)
+
+This function does not perform any interpretation of the returned
+data. It is either nil if there is no element in the matrix at these
+coordinates, or the string at point matching the regexp ``[^
+\t\n\r]+''
+ 
+@example
+i 1 24.78 -0.94 2793.230.7 0.4 ;_meuh_b.5
+i1 16.06 -0.96 3413.510.6 0.3
+i 1 29.98 -0.68 2792.310.6 0.7 ;_meuh_e.6
+
+(scomx-elt 1 1 "meuh")
+     => "1"
+
+(scomx-elt 1 2 "meuh")
+     => "i1"
+@end example
+
+@end defun
+
+
+@c ==================================================================
+@node Cmask integration, The repository, Basic functions, Score matrices
+@section Cmask integration
+
+@cindex Cmask
+
+Cmask is a powerful stochastic event generator, intended to generate
+full Csound scores. However, its is also very useful for simply
+filling a single matrix in a score. This is how csound-x uses it.
+
+
+First of all, you must be somewhat familiar with Cmask concepts. 
+Please read its very good documentation before you proceed with the
+rest of this chapter.  
+
+
+Cmask is not integrated by default. You need to turn
+'scomx-Cmask-support on and to set the values of 'scomx-Cmask-binary
+and 'scomx-Cmask-tmp-file (do so via the customization system) 
+
+Now here is how it works:
+
+@anchor{cmask}
+@defun  cmask matrix l1 &optional l2 l3 l4 l5
+Invoke Cmask for generating a p3 field which will be stored in the
+last column of matrix. Returns the modified matrix. If there is more
+than one column in matrix, the first one is considered as the p2
+values of reference when generating the p3 field. Weither it is
+actually a p2 column does not matter, but it must be sorted.
+
+If there is only one column, the p2 values are assumed to range evenly
+from 0 to 1.
+
+
+cmask is intended to be used within a 'scomx-operate-m body (as it is
+defined by a 'defmath macro) 
+@end defun
+
+example:
+
+@example
+(scomx-operate-m "meuh" (cmask m "seg [0 1]" "quant 0.1 1"))
+     =>
+
+i 1 24.78 -0.94 2793.231 0 ;_meuh_b.5
+i 1 16.06 -0.96 3413.512 0.5
+i 1 29.98 -0.68 2792.313 1 ;_meuh_e.6
+@end example
+
+Here the cmask function had Cmask process the following code: 
+
+@example
+f 1 4
+p1 const 1
+p2 item cycle (1 1)
+p3 seg [0 1]
+quant 0.1 1
+@end example
+
+The first three lines are automatically calculated so that the p2
+values mimic the first column of the targeted matrix, which must be
+sorted (otherwise cmask will refuse to proceed). If there is only one
+column, then the p2 values are supposed to range evenly from 0 to 1
+within the scope of the matrix.
+
+
+This is important since the p2 values are the reference for all
+time-dependent Cmask parameters.
+
+
+In our example, there is no time dependency: seg [0 1] means that the
+generated values must go from 0 to 1. But consider osc sin 1 . This
+generate a sine with frequency 1, thus the p2 values matter: with the
+matrix "meuh", three periods would be spawned (because the first
+column is [1 2 3]), while with a single column matrix it would be only
+one period (since p2 is supposed to go from 0 to 1).
+
+
+This may not be very clear, so I invite you to just try it and get the
+feeling. See also the "Cmask" submenu in the Matrix menu for an easier
+access to the full power of Cmask.
+
+
+@sp 1
+
+
+The following are example arguments for "Operate on matrix":
+
+@table @asis
+@item uniform randomvalues:
+(cmask m "range 10 15")
+
+@item uniform random values (with precision 4):
+(cmask m "range 10 15" "prec 4")
+
+@item values from 0 to 1:
+(cmask m "seg [0 1]")
+
+@item values from 0 to 1 (quantified):
+(cmask m "seg [0 1]" "quant 0.05 1")
+
+@item a more complex distribution:
+(cmask m "gauss [0.1 0.2] [0.3 0.8]" "mask 1000 2000" "quant 0.05 1")
+
+@end table
+
+@c ==================================================================
+@node The repository, Matrices & spreadsheets, Cmask integration, Score matrices
+@section The repository
+
+
+
+At the bottom of the "Matrix" menu is a code repository. It makes it
+faster to perform complex calculations on matrices, but it is worth
+noting that everything featured there can be done (albeit quite
+tediously) through the menu items "Operate on matrix" and "Operate on
+parameters".
+
+
+The repository is built from the evaluation of the customizable list
+of function 'scomx-Matrix-menu-definitions. By default it only contains
+the symbol 'scomx-Matrix-menu, which is the name of the function
+defining the code provided by default. If you look at it, you will be
+able to write your own equivalent functions: adding their names to
+'scomx-Matrix- menu-definitions will make your code available from the
+repository.
+
+
+Whenever you change something in this code, invoke the "Update" item
+in order to refresh the menu. 
+
+
+Among the proposed submenus, one is called "Cmask" and gets enabled if
+'scomx-Cmask-supportis non-nil. From there you can access most of Cmask
+features and apply them to the current matrix. Beware that only the
+last column is affected, and that the first column, if it is a
+different one, provide the p2 values for Cmask. @xref{cmask}. 
+
+
+
+
+
+@c ==================================================================
+@node Matrices & spreadsheets,  , The repository, Score matrices
+@section Matrices & spreadsheets
+
+@cindex spreadsheets
+@cindex SES mode
+@cindex <SES>
+
+If you installed the SES package, you should have the following four
+items in your Matrix menu (@pxref{Score matrices}): 
+
+@itemize @minus
+@item XML to spreadsheet 
+@item Spreadsheet to XML 
+@item Selection to spreadsheet 
+@item Spreadsheet to selection
+@end itemize
+
+They allow for each defined selection (that is, a matrix) to be
+associated to a spreadsheet buffer. The spreadsheet is completely
+independent from the source sco or CSD file, but its content can be
+stuffed back in the source whenever you want, either directly or as a
+<SES>...</SES> markup in a CSD file, in which case the formulas can be
+kept accross sessions.
+
+
+
+The usage is pretty simple. Here is an example: suppose we have a CSD
+buffer with the following score section: 
+
+@example
+<CsScore>
+
+i 1 0 3
+i 2 4 3
+i 3 8 3
+i 4 12 3
+i 5 16 5
+e
+</CsScore>
+@end example
+
+... where we define a gold matrix as follows: 
+
+@example
+<CsScore>
+
+i 1 0 3 ;_gold_b.1
+i 2 4 3
+i 3 8 3
+i 4 12 3
+i 5 16 5 ;_gold_e.2
+e
+</CsScore>
+@end example
+
+Now doing "Selection to spreadsheet" with argument "gold" creates a
+SES buffer with 2 columns for the source selection, plus a number of
+extra columns defined by scomx-spreadsheets-borders (by default it´s
+3): 
+
+
+@example
+ A       B       C       D       E
+ --------------------------------------- 
+      1       0
+      2       4
+      3       8
+      4      12
+      5      16
+@end example
+
+Depending on the value for scomx-framed-spreadsheets, the SES buffer
+may appear in the other window or in a specific frame.
+
+
+Now we set the formula for B1 as (* 2 A1) and copy this to all cells
+in the B column (see the SES documentation for details, @pxref{(SES)Top}.):
+
+
+@example
+ A       B       C       D       E
+ ---------------------------------------    
+      1       2
+      2       4
+      3       6
+      4       8
+      5      10
+@end example
+
+At this point, if we go back to the CSD buffer and do a "Spreadsheet
+to selection" with argument "gold", the gold matrix will be updated
+according to the content of the spreadsheet: 
+
+
+@example
+<CsScore>
+
+i 12 3 ;_gold_b.1
+i 24 3
+i 36 3
+i 48 3
+i 510 5 ;_gold_e.2
+e
+</CsScore>
+@end example
+
+This did not save the formulas we used to calculate the second
+column. If we want to keep them, we do "Spreadsheet to XML", again
+with a "gold" argument. A <SES>...</SES> markup area is then inserted
+at the end of the CSD buffer. Later on, invoking "XML to spreadsheet"
+with "gold" will re-create the SES buffer complete with its formulas,
+making it possible to work again on the gold selection.
+
+
+The parameter 'cscsd-ses-areas-invisible defines weither the content of
+a SES XML area is actually displayed in the CSD buffer. By defaults it
+is not.
+
+
+Note that "Spreadsheet to XML" does not imply a "Speadsheet to
+selection". It does not change the score content: this is only a way
+to store the spreadsheet associated to a matrix for a later usage. If
+the matrix size or content is changed meanwhile, or if the selection
+disappear altogether, this will not be reflected in the XML area.
+
+
+
+The extra columns (and rows) in the SES buffer may be used to store
+any temporary or seeding value. When the matrix is yanked back, they
+are ignored; when the spreadsheet is stored as an XML area, they are
+stored as any other component of the spreadsheet (see the SES
+documentation for details about its file format).
+
+
+For example, we can set B1 formula to (* D1 A1) and copy this in the B
+column: 
+
+
+@example
+ A       B       C       D       E
+ ---------------------------------------    
+      1       2    fact:      2
+      2       4
+      3       6
+      4       8
+      5      10
+@end example
+
+now if we change the D1 value to 3, the matrix becomes: 
+
+@example
+ A       B       C       D       E
+ ---------------------------------------    
+      1       3    fact:      3
+      2       6
+      3       9
+      4      12
+      5      15
+@end example
+
+we can check that when stuffing back the values, only the two first
+columns are taken into account: 
+
+
+@example
+<CsScore>
+
+i 13 3 ;_gold_b.1
+i 26 3
+i 39 3
+i 412 3
+i 515 5 ;_gold_e.2
+e
+</CsScore>
+@end example
+
+
+@sp 3
+
+@cindex Calc expressions in spreadsheets
+Note that Calc is integrated to the spreadsheet through the macros
+'calc-cell and 'calc-alg-cell, so you may type this kind of forms to
+edit a cell contents:
+
+@example
+RET (calc-cell (round (/ A1 B1)))
+RET (calc-alg-cell "round(A1/B1)")
+@end example
+
+The parameters 'scomx-ses-calc-shortcut (default is 'm:) and
+'scomx-ses-calc-alg-shortcut (default is 's:) provide shortcuts:
+
+@example
+RET (m: (round (/ A1 B1)))
+RET (s: "round(A1/B1)")
+@end example
+
+
+@c ==================================================================
+@c ==================================================================
+@node Handling MIDI data, Embedded elisp, Score matrices, Top
+@chapter Handling MIDI data within a CSD
+
+Csound-x can interface with several systems for musical
+composition; one of them is Keykit from which it borrows the
+MIDI data representation (@pxref{The k library}).
+
+Keykit home page: @uref{http://thompsonresidence.com/keykit}
+
+Another system is muO, based on Squeak (@pxref{(Surmulot)Top}). 
+Surmulot home page: @uref{http://www.zogotounga.net/surmulot/surmulot.html}
+
+
+
+@cindex Keykit
+@cindex <KeyPhrase>
+@cindex embedding a MIDI phrase in a CSD
+
+@sp 1
+@unnumberedsubsec Using Keykit as MIDI engine
+
+If you have Keykit installed on your system, customize the group
+'keykit so that csound-x knows how to work with it.
+
+It is then possible to generate a MIDI file from within a CSD
+document. This happens in specific areas of the form:
+
+@example
+<KeyPhrase label="name">
+...
+</KeyPhrase>
+@end example
+
+where ... stands for arbitrary Keykit code. This code is expected to
+define a KeyPhrase variable (whose value will become the MIDI file)
+
+The ``KeyPhrases'' entry under the ``CSD'' menu lists all names for
+the currently existing <KeyPhrase> areas in the buffer. From the 
+corresponding submenu it is possible to have the phrase as MIDI input.
+
+The processing works as follows:
+
+@itemize
+@item The Keykit code is evaluated: this should define a KeyPhrase
+variable, which is automatically stored as a temporary MIDI file
+@item A temporary copy of the CSD is created, where the <Options> section is set
+in order to read events from the previous MIDI file. 
+
+Also, a f0 statement corresponding to the length of the file (plus the
+value of the customizable variable 'cscsd-key-decay) is inserted at the end of the score section.
+
+Since this may be rather clumsy, another mechanism is provided: if a
+macro MidiPhraseDuration is defined in the score, its value is set to
+the duration of the file (again, plus 'cscsd-key-decay). In this case
+no f0 statement is created.
+
+Note that, for convenience, the CSD menu item "insert KeyPhrase
+area" (@pxref{The CSD menu}) also writes the following at the beginning of the score section:
+
+@example
+;#define MidiPhraseDuration ##
+;f0 $MidiPhraseDuration.
+@end example
+
+..simply uncommenting these two lines should do the trick for most
+simple scores.
+
+ 
+@item This CSD is processed according to the current selected
+processing function (@pxref{The CSD menu})
+@end itemize
+
+@sp 1
+@unnumberedsubsec Using muO as MIDI engine
+
+In very much the same way we can generate MIDI data from Squeak by
+defining specific areas of format
+
+@example
+<MPhrase label="name">
+...
+</MPhrase>
+@end example
+
+where ... stands for Smalltalk code defining a mphrase variable.
+
+Surmulot widgets can do this automatically:
+@pxref{(Surmulot)Musical phrase editor} and @pxref{(Surmulot)MIDI}.
+
+
+
+@sp 2
+@unnumberedsubsec Example
+
+Here is a full CSD example (the orc code is from Istvan Varga,
+simplified and adapted for MIDI by me):
+
+
+@example
+<KeyPhrase label="loop">
+KeyPhrase=repeat('ad50,e,d',10)
+</KeyPhrase>
+
+<KeyPhrase label="fractal">
+KeyPhrase=fractal('ad200,e,d,g,a')
+</KeyPhrase>
+
+<MPhrase label="fractal">
+|mphrase| mphrase:='ad200,e,d,g,a' kmusic fractal.
+</MPhrase>
+
+<CsoundSynthesizer>
+<CsInstruments>
+/* bsln1.orc - written by Istvan Varga */
+sr      =  44100
+kr      =  22050
+ksmps   =  2
+nchnls  =  1
+
+massign 1, 1
+
+        instr 1
+
+  imp4  notnum                                  ; pour MIDI
+  imp5  veloc                                   ; id 
+  imp6  midictrl        10, 80, 92
+
+  icps  =       440*exp(log(2)*(imp4-69)/12)    ; oscillator frequency
+  iamp  =       0.0039+imp5*imp5/16192          ; amplitude
+  ifrq1 =       440*exp(log(2)*(imp6-69)/12)    ; filter start freq.
+
+  kamp  linsegr 1, 0.5, 1, 0.025, 0             ; release envelope
+
+  kcps  port    icps, 0.005, icps*0.5           ; osc. frequency
+  knumh =       sr/(2*kcps)
+
+  kffrq port    0, 60/150, ifrq1                ; filter frequency
+
+  a1    phasor  kcps                            ; oscillator
+  a1    =       1-2*a1
+
+  a1x   butterbp        a1, kffrq, icps*1.0     ; filters
+  a1x   =       a1x*(2+kffrq/kcps)              ; correct amplitude
+  a1    =       a1x+a1*0.5
+  a1    butterlp        a1, kffrq
+
+  a1    =       taninv(a1* 2.5*iamp) ; distortion
+  a1    =       a1*kamp*20000
+
+        out a1
+        endin
+
+</CsInstruments>
+
+<CsScore> </CsScore>
+</CsoundSynthesizer>
+@end example
+
+@sp 1
+
+Get this code in a CSD buffer by clicking anywhere inside it and doing
+@samp{M-x cscsd-at-point}. 
+
+Now in the new CSD buffer the menu items "CSD->KeyPhrases->loop" and
+"CSD->KeyPhrases->fractal" will have Keykit process the corresponding
+MIDI phrases, as defined in the <KeyPhrase> areas. 
+
+Similarly, "CSD->MPhrases->fractal" will let you process or edit via
+µO the "fractal" phrase.
+
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node Embedded elisp, CSD meta-controls, Handling MIDI data, Top
+@chapter Embedded Emacs Lisp
+ 
+@cindex EEL mode
+@cindex <ELISP>
+ 
+If you got Csound-x through the stef-elisp distribution, you should
+also find there embedded-elisp-library.el which provides the 
+embedded-elisp minor mode.
+
+Basically, doing "embedded elisp" means stuffing a document (in our
+case a CSD document) with lisp code areas intended to be evaluated
+interactively in order to modify or process the document.
+
+To activate csound-csd-mode support for embedded elisp, select the
+``CSD -> Invoke EEL mode'' menu item. 
+
+This gives birth to a ``EEL'' menu from which you can manage <ELISP>
+areas. Please refer to the documentation in embedded-elisp-library.el
+for general info about the minor mode.
+
+When the customizable variable cscsd-use-EEL is non-nil, EEL mode is
+invoked automatically when an <ELISP> area is detected in the CSD document.
+
+
+@sp 1
+
+The next sections introduce a set of libraries intended to be used
+with embedded elisp:
+
+@itemize @bullet
+@item
+ csound-eel.el allows meta-control of a CSD document (@pxref{CSD meta-controls})
+@item
+ i.el is a score generator library (@pxref{The i library})
+@item
+ k.el is an extension of i.el using Keykit format for notes (@pxref{The k library})
+@end itemize
+
+@sp 1
+@unnumberedsubsec A simple example.
+
+
+Here is a CSD document with an <ELISP> area allowing the exploration
+of a set of possible configurations.
+
+The code plays with the values of macros $m1., $m2. and $m3. so that
+it tries 8 different combinations.
+
+The 8 corresponding CSD are written in the directory where lives the
+original CSD. For each of these files, a wave file is rendered in SFDIR.
+
+
+@example
+<ELISP> ;;; [load] - [collapse/unfold] - [save] - [EVAL] - [;EVAL]
+(let ((cscsd-current-processing "csound wav") 
+      (cscsd-call-csound-always-sync t)) 
+  ;; the let statement gives the correct options to csound
+  ;; and ensure that csound will not be executed asynchronously
+  (dotimes (i1 2 3)
+    (dotimes (i2 2 3)
+      (dotimes (i3 2 3)
+	(let* ((m1 (+ 2 i1))
+	       (m2 (+ 1 i2 m1))
+	       (m3 (+ 1 i3 m2)))
+	  (cscsd-set-macro-def "m1" m1)
+	  (cscsd-set-macro-def "m2" m2)
+	  (cscsd-set-macro-def "m3" m3)
+	  (let ((csd-file-name (expand-file-name 
+				(format "example%d-%d-%d.csd" m1 m2 m3)
+				(file-name-directory (buffer-file-name)))))
+	    (write-region (point-min) (point-max) csd-file-name)
+	    (message "processing m1=%d m2=%d m3=%d ..." m1 m2 m3)
+	    (cscsd-process csd-file-name)))))))
+</ELISP>
+
+<CsoundSynthesizer>
+<CsInstruments>
+#define m3 #8#
+#define m2 #4#
+#define m1 #2#
+
+; ************************************************************************
+; ACCCI:      02_43_1.ORC
+; timbre:     tibetan chant
+; synthesis:  additive same units(02)
+;             basic instrument with minimal differences in frequency(43)
+;             arpeggio instrument by Risset
+; source:     Phase6, Lorrain(1980); Boulanger(1990): risset1.orc
+; coded:      jpg 9/93
+
+sr = 44100
+kr  =  441
+ksmps= 100
+nchnls = 2
+
+instr 1; *****************************************************************
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = $m1.*p6
+ioff3 = $m2.*p6
+ioff4 = $m3.*p6
+irise = p7
+idec  = p8
+
+   ae  linen   iamp,irise,idur,idec   
+
+   a1  oscili  ae, ifq, 1
+   a2  oscili  ae, ifq+ioff1, 1  ; nine oscillators with the same ae
+   a3  oscili  ae, ifq+ioff2, 1  ; and waveform, but slightly different
+   a4  oscili  ae, ifq+ioff3, 1  ; frequencies create harmonic arpeggio
+   a5  oscili  ae, ifq+ioff4, 1
+   a6  oscili  ae, ifq-ioff1, 1
+   a7  oscili  ae, ifq-ioff2, 1
+   a8  oscili  ae, ifq-ioff3, 1
+   a9  oscili  ae, ifq-ioff4, 1
+
+   outs1   a1+a2+a3+a4+a5+a6+a7+a8+a9
+
+endin
+
+
+instr 2; *****************************************************************
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = $m1.*p6
+ioff3 = $m2.*p6
+ioff4 = $m3.*p6
+irise = p7
+idec  = p8
+
+   ae  linen   iamp,irise,idur,idec   
+
+   a1  oscili  ae, ifq, 1
+   a2  oscili  ae, ifq+ioff1, 1  ; nine oscillators with the same ae
+   a3  oscili  ae, ifq+ioff2, 1  ; and waveform, but slightly different
+   a4  oscili  ae, ifq+ioff3, 1  ; frequencies create harmonic arpeggio
+   a5  oscili  ae, ifq+ioff4, 1
+   a6  oscili  ae, ifq-ioff1, 1
+   a7  oscili  ae, ifq-ioff2, 1
+   a8  oscili  ae, ifq-ioff3, 1
+   a9  oscili  ae, ifq-ioff4, 1
+
+   outs2   a1+a2+a3+a4+a5+a6+a7+a8+a9
+
+endin
+</CsInstruments>
+
+<CsScore>; ************************************************************************
+; ACCCI:      02_43_1.SCO
+; coded:      jpg 9/93
+
+
+; GEN functions **********************************************************
+
+; carrier
+f1 0 1024 10 .3 0 0 0 .1 .1 .1 .1 .1 .1
+
+
+; score ******************************************************************
+
+;    start   idur  iamp   ifq     ioff   irise   idec
+i1	0	35	8000	110	0.03	0.07	21    
+i1	20	20	9600	110	0.04	2	4     
+i1	28	30	8000	220	0.04	3	6      
+i1	32.1	23	8000	110	0.03	2.3	4.6      
+i2	5	20	9600	55	0.02	0.04	12      	
+i2	20	15	8000	220	0.05	1.5	3   
+i2	32	26	9600	110	0.025	2.6	5.2    
+i2	36	22	8000	55	0.01	0.04	13    
+e
+
+</CsScore>
+</CsoundSynthesizer>
+@end example
+
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node CSD meta-controls, The i library, Embedded elisp, Top
+@chapter CSD meta-controls
+@cindex meta-comments
+
+Csound-x defines a specific type of comment line in both orchestra and
+score sections. Those comments begins with ;| and the following
+keywords are interpreted as a directive for ``meta-control'', that is
+a control flow or editing structure which has no meaning at the csound
+langage level and only makes sense for Emacs.
+
+Once defined, such a control structure can be operated from the first
+part of the ``CSD'' menu and notably from the ``Meta-setting'' submenu.
+
+@menu
+* Meta menus and toggles::      Selecting only parts of a CSD
+* Public sections::             Displaying a public interface
+* CSD snapshots::               Storing arbitrary parameters
+* Meta settings tutorial::      A detailed example
+@end menu
+
+
+@c ==================================================================
+@c ==================================================================
+@node Meta menus and toggles, Public sections, CSD meta-controls, CSD meta-controls
+@chapter Meta menus and toggles
+
+The following meta-comments pairs can be used to easily comment out
+parts of the CSD:
+
+@example
+;|menu
+;|endmenu
+
+;|toggles
+;|endtoggles
+@end example
+
+@xref{Meta settings tutorial}.
+
+
+@c ==================================================================
+@c ==================================================================
+@node Public sections, CSD snapshots, Meta menus and toggles, CSD meta-controls
+@chapter Public sections
+
+The meta-comments pair
+@example
+;|begpublic SomeName
+;|endpublic
+@end example
+
+enclose a part of the CSD which is supposed to be often tweaked by the
+composer. 
+
+When such public sections appear in a CSD, the ``CSD'' menu propose an
+item ``Public mode''. This builds and display a ``public interface''
+frame for the CSD, where only the public sections are visibles. 
+
+Use item ``Full editing mode'' to restore the initial display.
+
+
+@c ==================================================================
+@c ==================================================================
+@node CSD snapshots, Meta settings tutorial, Public sections, CSD meta-controls
+@chapter CSD snapshots
+
+Snapshots are <ELISP> areas (@pxref{Embedded elisp}) which, when they
+are evaluated, restore the values for macros, meta-menus and toggles
+in the CSD.
+
+Use "CSD -> Meta-Settings -> take a snapshot" to create a new
+snapshot; you will be prompted for a name in the minibuffer.
+
+Use the submenu "CSD -> Meta-Settings -> restore snapshot ->" to
+override the current settings with the recorded ones.
+
+@xref{Meta settings tutorial}.
+
+
+@c ==================================================================
+@c ==================================================================
+@node Meta settings tutorial, , CSD snapshots, CSD meta-controls
+@chapter Meta settings tutorial
+
+Let´s start from the following composition from the Amsterdam catalog of
+Csound instruments. If you are reading this in an emacs buffer, just
+click anywhere in the code below and do @samp{M-x cscsd-at-point} in
+order to have the CSD at hand. Here is the code:
+
+@example
+<CsoundSynthesizer>
+<CsInstruments>; ************************************************************************
+; ACCCI:      02_43_1.ORC
+; timbre:     tibetan chant
+; synthesis:  additive same units(02)
+;             basic instrument with minimal differences in frequency(43)
+;             arpeggio instrument by Risset
+; source:     Phase6, Lorrain(1980); Boulanger(1990): risset1.orc
+; coded:      jpg 9/93
+
+sr = 44100
+kr  =  441
+ksmps= 100
+nchnls = 2
+
+instr 1; *****************************************************************
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = 2*p6
+ioff3 = 3*p6
+ioff4 = 4*p6
+irise = p7
+idec  = p8
+
+   ae  linen   iamp,irise,idur,idec   
+
+   a1  oscili  ae, ifq, 1
+   a2  oscili  ae, ifq+ioff1, 1  ; nine oscillators with the same ae
+   a3  oscili  ae, ifq+ioff2, 1  ; and waveform, but slightly different
+   a4  oscili  ae, ifq+ioff3, 1  ; frequencies create harmonic arpeggio 
+   a5  oscili  ae, ifq+ioff4, 1
+   a6  oscili  ae, ifq-ioff1, 1
+   a7  oscili  ae, ifq-ioff2, 1
+   a8  oscili  ae, ifq-ioff3, 1
+   a9  oscili  ae, ifq-ioff4, 1
+       outs1   a1+a2+a3+a4+a5+a6+a7+a8+a9
+
+endin
+
+
+instr 2; *****************************************************************
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = 2*p6
+ioff3 = 3*p6
+ioff4 = 4*p6
+irise = p7
+idec  = p8
+
+   ae  linen   iamp,irise,idur,idec   
+
+   a1  oscili  ae, ifq, 1
+   a2  oscili  ae, ifq+ioff1, 1  ; nine oscillators with the same ae
+   a3  oscili  ae, ifq+ioff2, 1  ; and waveform, but slightly different
+   a4  oscili  ae, ifq+ioff3, 1  ; frequencies create harmonic arpeggio
+   a5  oscili  ae, ifq+ioff4, 1
+   a6  oscili  ae, ifq-ioff1, 1
+   a7  oscili  ae, ifq-ioff2, 1
+   a8  oscili  ae, ifq-ioff3, 1
+   a9  oscili  ae, ifq-ioff4, 1
+       outs2   a1+a2+a3+a4+a5+a6+a7+a8+a9
+endin
+</CsInstruments>
+
+<CsScore>; ************************************************************************
+; ACCCI:      02_43_1.SCO
+; coded:      jpg 9/93
+
+
+; GEN functions **********************************************************
+
+; carrier
+f1 0 1024 10 .3 0 0 0 .1 .1 .1 .1 .1 .1
+
+
+; score ******************************************************************
+
+;    start   idur  iamp   ifq     ioff   irise   idec
+i1	0	35	8000	110	0.03	0.07	21    
+i1	20	20	9600	110	0.04	2	4     
+i1	28	30	8000	220	0.04	3	6      
+i1	32.1	23	8000	110	0.03	2.3	4.6      
+i2	5	20	9600	55	0.02	0.04	12      	
+i2	20	15	8000	220	0.05	1.5	3   
+i2	32	26	9600	110	0.025	2.6	5.2    
+i2	36	22	8000	55	0.01	0.04	13    
+e
+
+</CsScore>
+</CsoundSynthesizer>
+@end example
+
+We are going to transform this into a template allowing an exploration
+of the algorithm. The instruments (identical, except from their ouput
+channel) are very simple: a reference oscillator at frequency p5 is
+doubled by height extra oscillators whose frequencies are slight
+variations of p5 controlled by p6. Given p6, the set of shifted
+frequencies is hardcoded: p5+p6, p5+2*p6, p5+3*p6, p5+4*p6, p5-p6,
+p5-2*p6, p5-3*p6 and p5-4*p6
+
+
+Using the "macroify region" function (@xref{The CSD menu}.), it is easy
+to transform the CSD so that the p6 multipliers are now defined by the
+macros m1, m2 and m3, so that we obtain:
+
+@example
+<CsoundSynthesizer>
+<CsInstruments>
+#define m3 #4#
+#define m2 #3#
+#define m1 #2#
+
+...
+
+instr 1
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = $m1.*p6
+ioff3 = $m2.*p6
+ioff4 = $m3.*p6
+irise = p7
+idec  = p8
+
+...
+
+instr 2
+idur  = p3
+iamp  = p4/9
+ifq   = p5
+ioff1 = p6
+ioff2 = $m1.*p6
+ioff3 = $m2.*p6
+ioff4 = $m3.*p6
+irise = p7
+idec  = p8
+
+...
+
+@end example
+
+Now let's click on "CSD -> Meta-Settings -> take a snapshot"; we give
+it the name "original" at the minibuffer. 
+
+Here is what gets inserted somewhere at the beginning of the buffer:
+
+@example
+
+<ELISP> ;SNAPSHOT: original [export] [restore] [see/hide]
+(require 'csound-eel)
+(cseel-restore-snapshot '((:define "m3" :value "4" :in orc) (:define "m2" :value "3" :in orc) (:define "m1" :value "2" :in orc)))
+</ELISP>
+
+
+<CsoundSynthesizer>
+#define m3 #4#
+#define m2 #3#
+#define m1 #2#
+
+...
+
+@end example
+
+The [...] parts in the first line should appear as buttons. If for
+some reason it is not the case, then clicking ``EEL -> Wake up
+embedded buttons'' should do the trick.
+
+@sp 1
+
+Now when clicking on the [restore] button, m1, m2 and m3 will get
+back to their original values.
+
+Restoring a snapshot is also possible from the "Settings" menu, where
+a "Restore snapshot" submenu should appear, providing a list of all
+defined snapshots in the buffer.
+
+@sp 1
+
+So now we can go on and change the definitions for m1, m2, m3 to, say,
+2, 4 and 8. Then, taking another snapshot called "248", we get this:
+
+@example
+
+<ELISP> ;SNAPSHOT: 248 [export] [restore] [see/hide]
+(require 'csound-eel)
+(cseel-restore-snapshot '((:define "m3" :value "8" :in orc) (:define "m2" :value "4" :in orc) (:define "m1" :value "2" :in orc)))
+</ELISP>
+
+<ELISP> ;SNAPSHOT: original [export] [restore] [see/hide]
+(require 'csound-eel)
+(cseel-restore-snapshot '((:define "m3" :value "4" :in orc) (:define "m2" :value "3" :in orc) (:define "m1" :value "2" :in orc)))
+</ELISP>
+
+...
+
+@end example
+
+Now, what about having only the upper frequencies added, or maybe only
+the lower ones ?
+
+We can do so by defining a meta-menu. We just have to replace 
+
+@example
+       outs1   a1+a2+a3+a4+a5+a6+a7+a8+a9
+@end example
+
+with 
+
+@example
+;|menu 1Frequencies
+;|all
+       outs1   a1+a2+a3+a4+a5+a6+a7+a8+a9
+;|upper
+;        outs1   a1+a2+a3+a4+a5
+;|lower
+;        outs1   a1+a6+a7+a8+a9
+;|endmenu
+@end example
+
+... and do the same for instrument 2:
+
+@example
+;|menu 2Frequencies
+;|all
+       outs2   a1+a2+a3+a4+a5+a6+a7+a8+a9
+;|upper
+;        outs2   a1+a2+a3+a4+a5
+;|lower
+;        outs2   a1+a6+a7+a8+a9
+;|endmenu
+
+@end example
+
+The ;|... comments are meta-comments. If you go to the "Meta-Settings"
+menu, you will see that there are now two more entries: a submenu
+"1Frequencies" and a submenu "2Frequencies", both providing the items
+"all", "upper" and "lower". By selecting those items, you actually
+comment and uncomment the corresponding sections in the CSD.
+
+Note that this is also recorded when snapshotting. Let´s select "upper"
+in both instruments, then take a new snapshot "248up". Here is the
+resulting ELISP area:
+
+@example
+<ELISP> ;SNAPSHOT: 248up [export] [restore] [see/hide]
+(require 'csound-eel)
+(cseel-restore-snapshot '((:define "m3" :value "8" :in orc) (:define "m2" :value "4" :in orc) (:define "m1" :value "2" :in orc) (:menu "1Frequencies" :type "menu" :item "all" :active nil) (:menu "1Frequencies" :type "menu" :item "upper" :active t) (:menu "1Frequencies" :type "menu" :item "lower" :active nil) (:menu "2Frequencies" :type "menu" :item "all" :active nil) (:menu "2Frequencies" :type "menu" :item "upper" :active t) (:menu "2Frequencies" :type "menu" :item "lower" :active nil)))
+</ELISP>
+
+...
+@end example
+
+
+One more step: silenting out part of the score. Let´s replace 
+
+@example
+;    start   idur  iamp   ifq     ioff   irise   idec
+i1      0       35      8000    110     0.03    0.07    21    
+i1      20      20      9600    110     0.04    2       4     
+i1      28      30      8000    220     0.04    3       6      
+i1      32.1    23      8000    110     0.03    2.3     4.6      
+i2      5       20      9600    55      0.02    0.04    12              
+i2      20      15      8000    220     0.05    1.5     3   
+i2      32      26      9600    110     0.025   2.6     5.2    
+i2      36      22      8000    55      0.01    0.04    13    
+e
+@end example
+
+with
+
+@example
+;    start   idur  iamp   ifq     ioff   irise   idec
+;|toggles Score
+;|i1
+i1      0       35      8000    110     0.03    0.07    21    
+i1      20      20      9600    110     0.04    2       4     
+i1      28      30      8000    220     0.04    3       6      
+i1      32.1    23      8000    110     0.03    2.3     4.6      
+;|i2
+i2      5       20      9600    55      0.02    0.04    12              
+i2      20      15      8000    220     0.05    1.5     3   
+i2      32      26      9600    110     0.025   2.6     5.2    
+i2      36      22      8000    55      0.01    0.04    13    
+;|endtoggles
+e
+@end example
+
+This gives birth to a new submenu "Score" in "Meta-Settings", where
+you can choose weither to include the parts for i1 and i2 in the score.
+
+The difference between ;|menu and ;|toggles is that ;|menu allows
+only one among its items to be selected at a given time.
+
+@sp 1
+
+Our eventual CSD is now a template where structural choices can be
+performed in both score and orchestra, and where snapshots make it
+possible to keep at hand as many combinations of such choices and
+macro settings as we want. All of this being accessible through the
+"Meta-Settings" menu.
+
+And because everything happens either in comment lines of in XML areas
+external to the <CsoundSynthesizer> one, the CSD is still acceptable
+as a plain input file by csound.
+
+@c ==================================================================
+@c ==================================================================
+@node The i library, The k library, CSD meta-controls, Top
+@chapter i.el, a library for generating p-fields streams
+
+@cindex p-fields stream
+@sp 3
+
+@unnumberedsubsec Basics
+
+This library implements a set of functions making it very easy to compose a
+monophonic Csound score in one algorithmic shot. 
+
+The basic function is 'i, which insert a i-statement at point. Like
+this:
+
+@example
+(i 3 27 0.5 1500 0.125)
+
+which, as you would expect, inserts:
+
+i 3 27 0.5 1500 0.125
+@end example
+
+'i always lives in a specific context, which I call a p-fields stream,
+because its main purpose is to keep a memory of what was previously
+inserted
+
+For example, 'i has a sibling function called '|i which accepts a
+partial list of p-fields:
+
+@example
+(|i :dur 0.8)
+@end example
+
+inserts:
+
+@example
+i 3 27 0.8
+@end example
+
+... because the implicit top-level stream remembers the previous
+values of p1 and p2.
+
+Since only p1, p2 and p3 have a defined meaning, the top level stream
+does not attempt to manage the other p-fields. This has to be done
+explicitly by defining a local stream:
+   
+@example
+(with-pfields-stream '((4 (:pitch 8.01))
+                       (5 (:volume 1000))
+                       (6 (:pan 0)))
+  (|i)
+  (|i :start 30 :pitch 8.02)
+  (|i :start 35 :volume 1500))
+
+=> 
+
+i 3 27 0.8 8.01 1000 0
+i 3 30 0.8 8.02 1000 0
+i 3 35 0.8 8.02 1500 0
+@end example
+
+What happened here is that p1, p2 and p3 attributes where inherited
+from the top-level stream, so that again their values are remembered.
+In this top-level stream, the associated keys are :instr, :start and
+:dur, with default values 1, 0, 0
+
+
+To ignore the top-level stream (that's cleaner), just initialize everything:
+
+@example
+(with-pfields-stream '((1 (:instr 10))
+                       (2 (:start 0))
+                       (3 (:dur 0.5))
+                       (4 (:pitch 8.01))
+                       (5 (:volume 1000))
+                       (6 (:pan 0)))
+  (|i)
+  (+i :pitch 8.02)
+  (+i :volume 1500))
+
+=> 
+
+i 10 0 0.5 8.01 1000 0
+i 10 0.5 0.5 8.02 1000 0
+i 10 1 0.5 8.02 1500 0
+@end example
+
+This example introduces '+i, another sibling of 'i behaving almost
+exactly like '|i while managing p2 so that the event starts at the
+end of the previous note.
+
+@sp 1
+
+Note that although the instrument number (p-field 1) may vary, the
+other p-fields will still have only one current value. This is why I
+said at the beginning of this page that i.el can be used to generate
+monophonic scores: each instrument should have its own stream of parameters.
+
+@sp 1
+
+All p-fields values, when set through '|i, '+i and
+'with-pfields-stream can also be quoted lisp forms: 
+
+@example
+(with-pfields-stream '((1 (:instr 10))
+                       (2 (:start 0))
+                       (3 (:dur '(+ 0.5 (* 0.001 (random 100)))))
+                       (4 (:pitch 8.01))
+                       (5 (:volume '(+ 1000 (* 100 (now)))))
+                       (6 (:pan '(random 127))))
+  (|i)
+  (+i :pitch 8.02)
+  (+i :volume '(+ 1500 (* 100 (now)))))
+
+=>
+
+i 10	0	0.5950	8.0100	1000	60
+i 10	0.5030	0.5120	8.0200	1050.3000	51
+i 10	1.0690	0.5800	8.0200	1606.9000	28
+@end example
+
+This example also introduced 'now, a function returning the current
+value for p2. Here is an example generating longer and longer notes:
+
+@example
+(with-pfields-stream '((1 (:instr 10))
+                       (2 (:start 0))
+                       (3 (:dur '(+ 0.5 (/ (now) 10))))
+                       (4 (:pitch 8.01))
+                       (5 (:volume '(+ 1000 (random 300)))))
+  (dolist (p '(8.01 8.02 7.11 7.05 5.09 6.00 8.00)) 
+    (+i :pitch p)))
+
+=>
+
+i 10	0	0.5000	8.0100	1120
+i 10	0.5000	0.5500	8.0200	1087
+i 10	1.0500	0.6050	7.1100	1208
+i 10	1.6550	0.6655	7.0500	1252
+i 10	2.3205	0.7320	5.0900	1064
+i 10	3.0526	0.8053	6.0000	1109
+i 10	3.8578	0.8858	8.0000	1176
+@end example
+
+@sp 1
+
+There are other functions related to p2:
+
+@itemize
+@item 't+ and 't- offset the current value of p2 according to their argument, 
+@item 'now-be directly sets a new current value for p2, 
+@item 'now-> records p2 and associates it with a key, which can be
+used as an argument for 't+, 't- and 't-set.
+@item 'then-> similarly records p2+p3 and associates it with a key.
+@end itemize
+
+@sp 1
+In the following example we jump around in time:
+
+@example
+(with-pfields-stream '((1 (:p1 1))
+                       (2 (:p2 150))
+                       (3 (:dur 1.5))
+                       (4 (:pit 8.01))
+                       (5 (:vol 1000)))
+   (NOTE "Example")                   
+                      
+   (dotimes (bof 3)
+     (+i :pit 7.11)
+     (+i :pit 8.02 :vol ">"))
+
+   (end-note "now is bingo")
+   (now-> :bingo)
+   (+i :dur 3.5)
+   (+i :dur 0.8 :vol 1400)
+
+   (note "jumping around:")
+   (t- 3.5) (|i :dur 2 :vol 1500 :pit 9.00)
+   (t+ 35) (|i)
+
+   (note "back in time to bingo:")
+   (now-be :bingo) (|i)
+
+   (end-of-section))
+@end example
+
+This inserts the following score:
+
+@example
+/* Example */
+
+i 1     150     1.5     7.11    1000
+i 1     151.5   1.5     8.02    >
+i 1     153.0   1.5     7.11    >
+i 1     154.5   1.5     8.02    >
+i 1     156.0   1.5     7.11    >
+i 1     157.5   1.5     8.02    >       ; now is bingo
+i 1     159.0   3.5     8.02    >
+i 1     162.5   0.8     8.02    1400
+; jumping around:
+i 1     159.0   2       9.0     1500
+i 1     194.0   2       9.0     1500
+; back in time to bingo:
+i 1     157.5   2       9.0     1500
+e
+@end example
+
+As you can see, the stream continuity is a textual one, it is not
+time-wise: going back in time does not restore the previous default
+p-fields. This is an important point.
+ 
+@sp 3
+
+
+@defmac with-pfields-stream p-fields &rest body
+Defines a set of local variables used to maintain a stream of p-fields,
+then process BODY within that stream. 
+The stream is effected by the insertion functions |i, +i and i
+
+P-FIELDS is the local value of 'pfstream-pf-attributes.
+Format: '((NP (:KEY DEFAULT)) ...) where DEFAULT is either a number, a
+string or a quoted form
+
+If it is incomplete, it will inherit its missing attributes from the
+value of 'pfstream-pf-attributes in the outside scope. The top level
+scope (global) only defines p1, p2 and p3 
+
+@end defmac
+
+@sp 1
+
+@defun i &rest p-fields
+Insert an i-statement at point
+@end defun
+
+@sp 1
+
+@defun |i &rest fields-plist
+Insert an i-statement at point, using keys to identify the changing
+p-fields.
+The other p-fields values are inherited from the local stream
+@end defun
+
+@sp 1
+
+@defun +i &rest fields-plist
+Same as |i, only increments the current p2 by the current p3
+@end defun
+
+@sp 3
+
+The following functions are only valid within a `with-pfields-stream'
+body. This allows for short and simple names without the risk of a
+name clash. You may use `pfstream-defun' to define a new function of
+this kind.
+
+@sp 1
+
+@defun now
+return the current p2 value
+@end defun
+
+@sp 1
+
+@defun then
+return the current p2+p3 value
+@end defun
+
+@sp 1
+
+@defun now-be time
+set current p2 to TIME, a number or a key in 'pfstream-time-markers
+@end defun
+
+@sp 1
+
+@defun t+ time
+set current p2 plus TIME, a number or a key in 'pfstream-time-markers
+@end defun
+
+@sp 1
+
+@defun t- time
+set current p2 minus TIME, a number or a key in 'pfstream-time-markers
+@end defun
+
+@sp 1
+
+@defun now-> key
+associate current p2 to KEY in 'pfstream-time-markers
+@end defun
+
+@sp 1
+
+@defun then-> key
+associate current p2+p3 to KEY in 'pfstream-time-markers
+@end defun
+
+@sp 1
+
+@defun end-note &rest args
+insert ARGS as a comment at the end of the previous line
+@end defun
+
+@sp 1
+
+@defun note &rest args
+insert ARGS as a comment line
+@end defun
+
+@sp 1
+
+@defun NOTE &rest args
+insert ARGS as a /* comment */ with empty lines around it
+@end defun
+
+@sp 1
+
+@defun section
+insert a s-statement
+@end defun
+
+@sp 1
+
+@defun end-of-section
+insert a e-statement
+@end defun
+
+@sp 1
+
+@defmac pfstream-defun name args &rest body
+Define a new function valid only within a `with-pfields-stream' body.
+This macro itself can not be evaluated within a `with-pfields-stream'
+body ! 
+@end defmac
+
+@sp 1
+
+@defun pfstream-defalias short-name full-name
+Define an alias for function FULL-NAME, valid only within a pfield-stream
+@end defun
+
+
+@sp 3
+
+@unnumberedsubsec Custom keywords
+
+As described in the previous chapter, each p-field is associated to a
+keyword. It is possible and quite useful to define other keywords,
+called custom keywords, which are actually macros that expand into
+property lists, making it possible to set several p-fields at once.
+
+In the following example we define a :side keywords used to set both
+the volume and the position of the sound:
+
+@example
+(with-pfields-stream '((1 (:p1 1))
+                       (2 (:p2 150))
+                       (3 (:dur 1.5))
+                       (4 (:pitch 8.01))
+                       (5 (:volume 1000))
+                       (6 (:pan 0)))
+  (add-custom-key 
+    '(:side (:volume 'identity
+             :pan (lambda (v) (/ v 1000.0)))))   
+  (|i)
+  (+i :pitch 8.02 :side 700)
+  (|i :pitch 8.05 :side 850))
+
+=>
+
+i 1	150	1.5000	8.0100	1000	0
+i 1	151.5000	1.5000	8.0200	700	0.7000
+i 1	151.5000	1.5000	8.0500	850	0.8500
+@end example
+
+
+@sp 1
+@defun add-custom-key new-key-def 
+Register a new custom keyword for setting pfields in the stream
+NEW-KEY-DEF is a list (KEY VAL) where VAL is a plist or a function of one variable returning a plist.
+KEY will be expanded into that plist.
+when VAL is a function its single argument will be the value associated to KEY when it is invoked."
+@end defun
+
+@sp 1
+
+@defun add-custom-keys new-key-def-list
+Register at once a list of new custom keys
+@end defun
+
+@sp 3
+
+@unnumberedsubsec Nested streams 
+
+'with-pfields-stream create a new stream by copying all the current
+stream ``memory'' (p-fields values, time markers, custom keys)
+into local variables. 
+
+Nesting streams allow any of these values to be temporarily modified,
+all changes being cancelled when jumping back to the parent
+stream. 
+
+As for the implicit top-level stream, it is buffer local. Still,
+stream-related operations should always be done within an enclosing
+'with-pfields-stream form, so that there is no possible contamination
+of the top level between different chunks of code.
+
+@sp 1
+
+@defmac  save-stream &rest body
+create a new p-field stream with all p-fields values, time markers and custom keys inherited from the current stream. once BODY is evaluated, everything gets restored.
+equivalent to 'with-pfields-stream with P-FIELDS argument nil
+@end defmac
+
+@sp 1
+
+@defmac save-stream-insert &rest body
+create a new p-field stream with all p-fields values, time markers and
+custom keys inherited from the current stream. once BODY is evaluated,
+everything gets restored except the current time which is set to the
+end time of the exited stream.
+@end defmac
+
+@sp 3
+
+@unnumberedsubsec Score enumeration
+
+The functions i, +i and |i insert an i-statement at point. In some
+cases though, we may want to defer the insertion. We call ``score
+line'' an expression which, when evaluated, does insert an
+i-statement.
+
+So '(i 1 0 5 200) or '(+i) are score lines.
+
+A list of score lines is a score. Two powerful macros handles scores
+and score lines:
+
+@defmac along-score spec &rest body      
+SPEC is a list (VAR-SYM SCORE [INDEX-SYM] [SCORE-SYM])
+evaluate BODY with VAR taking in turn all note values in SCORE (a list)
+the macro optionaly binds one or two symbols in the scope of BODY: 
+INDEX-SYM is the position of VAR in SCORE (a number starting at 0)
+SCORE-SYM is bound to SCORE
+thus VAR is always equal to (nth <INDEX-SYM> <SCORE-SYM>)
+@end defmac
+
+@sp 1
+
+@defmac score-line event &rest plist
+Modify EVENT (a score-line) with PLIST, then evaluate the result.
+Thus (score-line '(+i amp: 200) :dur 1) is like (+i :amp 200 :dur 1)
+Note that (score-line 'a :vol 127) or (score-line '(i 1 0 2 500))
+are also legal syntaxes
+@end defmac
+
+@sp 1
+
+'i> is an alias for 'score-line
+
+@sp 1
+
+example:
+
+@example
+(with-pfields-stream '((4 (:amp 0))
+                       (5 (:vol 0)))
+  (along-score (n '((i 1 0 5 150 100)
+                    (+i :amp 200)
+                    (|i :vol 63)))
+  (i> n :duration 8)       
+  (end-note n)))
+
+=>
+
+i 1	0	8	150	100	; (i 1 0 5 150 100)
+i 1	8	8	200	100	; (+i :amp 200)
+i 1	8	8	200	63	; (|i :vol 63)
+@end example
+
+
+@sp 3
+
+@unnumberedsubsec Direct access to p-fields
+
+At times it is very useful to read the current value of a p-field, or
+to change it. This can be done with the following functions:
+
+@sp 1
+
+@defun current-pfield p-field
+return the current value of P-FIELD (a number or its associated key)
+in the stream.
+
+note that when it is a lisp form, it is not returned as such: intead,
+its evaluation as the body of a lambda expression is returned.
+
+use 'current-pfield-form if you want the quoted form itself.
+@end defun
+
+
+@sp 1
+
+@defun current-pfield-form p-field
+return the current value of P-FIELD (a number or its associated key)
+in the stream.
+
+when the current value of a p-field is a quoted lisp form, it is
+returned as such.
+
+use 'current-pfield if you want its current evaluation instead
+@end defun
+
+@sp 1
+
+@defun set-pfield p-field val
+set the current value of P-FIELD (a number or its associated key) to
+VAL (a number or a string or a quoted form)
+
+this function does not accept a custom key: use 'set-in-stream instead
+@end defun
+
+@sp 1
+
+@defun set-in-stream &rest key-val-plist
+set the current values for KEYs to VALs, expanding a KEY if it is a
+custom key
+@end defun
+
+@sp 3
+
+It is also possible to query a score line (see above for a definition
+of this term) for the value it defines for a given keyword:
+
+@defun score-line-pfield event pf
+return the value for pfield PF (a number or a key) as associated in EVENT (an i-statement).
+return nil if PF is not explicitely defined in EVENT.
+the custom keywords are not expanded; PF may be a custom keyword
+@end defun
+
+@sp 1
+
+@defun pfield event pf
+return the value for pfield PF (a number or a key) in EVENT (an i-statement).
+if PF is not explicitely defined, check if it appears when expanding the custom keys.
+if PF can still not be found in EVENT, return its current value in the stream .
+PF should not be a custom keyword
+@end defun
+
+
+
+@c ==================================================================
+@c ==================================================================
+@node The k library, Csound Elisp, The i library, Top
+@chapter k.el, extending i.el with MIDI streams
+
+
+@cindex keykit format
+@sp 3
+
+k.el is an extension of i.el that defines a specific format for
+musical notes based on Keykit representation of MIDI data.
+
+In Keykit, musical phrases are represented like this: 
+`ao2v100, e g, f+`
+
+Here the first note has an explicit octave and volume. The following notes
+inherit from these values. So this format is actually very close to
+what I called a p-field stream in the discussion of i.el
+
+Keykit notes, because they represent MIDI data, have specific ranges
+for volume and pitch: those are always integers from 0 to
+127. Duration is also expressed with integers, called clicks, with 192
+clicks in one second.
+
+The macro 'with-keykit-stream defines and initialises a mapping by the
+mean of custom keys, so that notes can explicitely refer to :pit :dur
+:vol :ch and :time, using the Keykit format.
+
+A large set of functions provide a wealth of shortcuts to write such
+notes. In the following we use four different ways to insert the same
+musical phrase:
+
+@example
+;; explicit invocation of '|i and '+i
+(with-keykit-stream
+        (|i :pit 57 :dur 150 :vol 90)   
+        (+i :pit 58)
+        (+i :pit 59 :ch 2))
+
+;; using Keykit format for pitches
+(with-keykit-stream
+        (ao2 :dur 150 :vol 90)
+        (,b-)
+        (,p59 :ch 2))
+
+;; with macro 'along-score:
+(with-keykit-stream
+ (along-score (n '(ao2d150v90 ,b- ,p59c2))
+   (i> n)))
+
+;; with macro 'along-keyphrase:
+(with-keykit-stream
+ (along-keyphrase (n "'ao2d150v90, b-, bc2'")
+   (i> n)))
+@end example
+
+@sp 1
+
+'along-score is the most powerful enumerating macro: it accepts about
+any format for notes, as illustrated in the following example
+
+@example
+(with-keykit-stream
+ (along-score (n '((i 1 10) 
+                   ,ao2d150v90
+                   (ad120 :vol 110)
+                   ,b-
+                   ,p59c2
+                   +i
+                   (i 3 14 :vol 80)))
+   (i> n)))
+
+=>
+
+i 1	10	0.5000	440.0000	4960.6299
+i 1	10.5000	0.7813	440.0000	7086.6142
+i 1	10.5000	0.6250	440.0000	7086.6142
+i 1	11.1250	0.6250	466.1638	7086.6142
+i 2	11.7500	0.6250	246.9417	7086.6142
+i 2	12.3750	0.6250	246.9417	7086.6142
+i 3	14	0.6250	246.9417	6299.2126
+@end example
+
+@sp 1
+
+'along-keyphrase actually handles any Keykit expression returning a
+phrase as argument. That expression is send to lowkey, evaluated there
+and the result is parsed. So we can write things like:
+
+@example
+(with-keykit-stream
+ (along-keyphrase (n "fractal('ao2d600v90, b-, bc2',2)")
+   (i> n)))
+@end example
+
+The mapping from :vol and :pit is set by default within
+'with-keykit-stream, and will need to be defined again in order to fit
+the orchestra. This can be done either by using functions
+'add-custom-key or 'add-custom-keys, like this:
+
+@example
+(add-custom-keys 
+ '((:vol (:amp (lambda (v) (midi-to-range v 0 300))))                                                
+   (:pit (:pitch 'midi-to-pch))))
+@end example
+
+Equivalent and more convenient, we have functions `kstream:vol and
+'kstream:pit
+
+@example
+(kstream:vol '(:amp (lambda (v) (midi-to-range v 0 300))))                                                
+(kstream:pit '(:pitch 'midi-to-pch))
+@end example
+
+@sp 3
+@unnumberedsubsec Reference
+
+@defmac with-keykit-stream &rest body
+  Defines a pfield-stream adapted to the transcription of Keykit phrases into a score
+@end defmac
+
+@sp 1
+
+@defun kstream:vol sexp
+  Perform (add-custom-key (list :vol SEXP))
+@end defun
+
+@sp 1
+
+@defun kstream:pit sexp
+  Perform (add-custom-key (list :pit SEXP))
+@end defun
+
+@sp 1
+
+@defmac along-keyphrase spec &rest body
+SPEC is a list (VAR KEYPHRASE [INDEX-SYM] [SCORE-SYM])
+evaluate BODY with VAR taking in turn all note values in KEYPHRASE (a Keykit expression)
+the macro optionaly binds one or two symbols in the scope of BODY: 
+'INDEX-SYM is the order position of VAR in KEYPHRASE (starting at 0)
+'SCORE-SYM is the computed list of all notes in KEYPHRASE
+thus VAR is always equal to (nth <INDEX-SYM> <SCORE-SYM>)
+@end defmac
+
+@sp 1
+
+@defmac along-KeyPhrase spec &rest body
+...
+@end defmac
+
+@sp 1
+
+@defmac along-MIDIfile spec &rest body
+...
+@end defmac
+
+
+@c ==================================================================
+@c ==================================================================
+@node Csound Elisp, Concept index, The k library, Top
+@chapter Composing directly in Emacs Lisp
+
+Csound-x can work upside-down: instead of editing Csound files you
+can directly compose in Emacs Lisp in a way that hides the underlying
+CSD structure:
+
+@lisp
+(csl-play-composition
+ (csound-composition
+   :ftables (1 :sin 8192)
+   :instr 1 
+   [out (oscili :arate (oscili :krate p4 1/p3 p7) p5 p6)]
+   :score (insert "f 2 0 513 5 1 12 1024 500 1" ?\n)
+   :i-stream
+   (i 1 0 4 8000 440 1 2)  
+   (loop for h in '(2200 600 215 1852 990)
+         for d in '(2 2.5 2 1.5 4)
+         do (+i :p5 h :p3 d))))
+@end lisp
+
+... this is very much a work in progress and still subject to important
+changes. please do not rely on the current API.
+
+see doc strings, tests and examples in csound-lsp.el for details
+
+
+@c ==================================================================
+@c ..................................................................
+@node Concept index, Command index, Csound Elisp, Top
+@printindex cp
+
+@c ..................................................................
+@node Command index, Variable index, Concept index, Top
+@unnumbered Command Index
+
+@noindent
+Commands available via @kbd{M-x} prefix.
+
+@printindex pg
+
+@c ..................................................................
+@node Variable index, Function index, Command index, Top
+@unnumbered Variable Index
+
+@noindent
+Csound-x variables and hooks
+
+@printindex vr
+
+@c ..................................................................
+@node Function index, Known bugs, Variable index, Top
+@unnumbered Function Index
+
+@noindent
+Csound-x public functions
+
+@printindex fn
+
+@c ..................................................................
+@c ==================================================================
+@node Known bugs,  , Function index, Top
+@cindex bugs
+@unnumbered Known bugs and incompatibilities
+
+@sp 1
+
+MMM-mode is not kind with imenu. Turning on the ``Index'' menu for
+all emacs-lisp-mode buffers will cause troubles at time.
+
+Fix: deactivate imenu for emacs-lisp-mode buffers
+
+@sp 1
+
+Csound-x is developped with GNU Emacs 21, on Windows XP. 
+XEmacs is not supported at all. 
+The CVS version of GNU Emacs (22.0.50.1 at the time of this writing) is checked regularly and should be supported; if you find bugs please report them.
+
+@bye
+
+
+@comment Local variables:
+@comment version-control: t
+@comment End:
