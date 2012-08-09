@@ -1,5 +1,3 @@
-;;; -*- auto-recompile: t -*-
-
 ;;; csound-x.el --- extending csound-sco and csound-orc major modes
 ;;;                 this is the installation code
 
