@@ -1239,4 +1239,4 @@
 (puthash "*" (quote (:function "*" :html "multiplies.html")) csdoc-opcode-database)
 (puthash "%" (quote (:function "%" :html "modulus.html")) csdoc-opcode-database)
 (puthash "!=" (quote (:function "!=" :html "notequal.html")) csdoc-opcode-database)
-(provide (quote csound-opcodes))
+(provide 'csound-x-opcodes)

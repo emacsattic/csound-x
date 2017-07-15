@@ -764,7 +764,7 @@ that variable `csdoc-opcode-database' is not nil"
   (interactive)
   (when csdoc-opcode-database
     (let ((ofile (expand-file-name 
-		  "csound-opcodes.el"
+		  "csound-x-opcodes.el"
 		  (file-name-directory (locate-library "csound-x")))))
       (with-temp-file ofile
 	(insert (format "%S\n" '(setq csdoc-opcode-database (makehash 'equal))))
@@ -773,7 +773,7 @@ that variable `csdoc-opcode-database' is not nil"
 	   (insert (format "%S\n"
 			   `(puthash ,opcode ',plist csdoc-opcode-database))))
 	 csdoc-opcode-database)
-	(insert (format "%S" '(provide 'csound-opcodes))))
+	(insert (format "%S" '(provide 'csound-x-opcodes))))
       (byte-compile-file ofile))))
 
 (defun csdoc-save-opcode-typology ()
@@ -788,17 +788,17 @@ that variable `csdoc-opcode-database' is not nil"
 			   '(csdoc-irregular-opcodes csdoc-deprecated-opcodes)))
 	(insert (format "%S\n"
 			`(setq ,var ',(eval var)))))
-      ;; provide 'csound-opcodes
+      ;; provide 'csound-x-opcodes
       (insert (format "%S" '(provide 'csound-opcode-typology))))
     (byte-compile-file ot-file)))
 
 ;; initialization from cache, if any:
-(require 'csound-opcodes nil t)
+(require 'csound-x-opcodes nil t)
 (require 'csound-opcode-typology nil t)
 
 ;; safety check:
 ;;
-;; ... for cases when csound-opcodes.el is not synchronized with csdoc-opcode-typology
+;; ... for cases when csound-x-opcodes.el is not synchronized with csdoc-opcode-typology
 ;; (new defvars were not saved yet via (csdoc-save-opcode-database))
 ;; this should only happen while developping csound-x; users should not see this
 (when (loop for var-spec in csdoc-opcode-typology
